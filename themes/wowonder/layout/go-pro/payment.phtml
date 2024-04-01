@@ -1,0 +1,356 @@
+<link href="<?php echo Wo_LoadAdminLink('plugins/sweetalert/sweetalert.css'); ?>" rel="stylesheet" />
+<div class="page_loader">
+	<i class='fa fa-spinner fa-spin '></i>
+</div>
+<div class="wo_about_wrapper_parent">
+	<div class="wo_about_wrapper">
+		<div class="hero hero-overlay">
+			<div class="container wo_go_pro">
+				<div class="col-md-8">
+					<h1 class="head_pro"><?php echo $wo['config']['siteName']; ?> 
+					<!-- <span class="pro-badge">PRO</span> -->
+					</h1>
+					<h1 class="main_head_pro"><?php echo $wo['lang']['pro_feature_control_profile']; ?></h1>
+				</div>
+				<div class="col-md-4 hidden-rocket">
+					<img src="<?php echo $wo['config']['theme_url']; ?>/img/go-pro/rocket.svg" alt="go-pro" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<?php $type = $_GET['type'];
+	$is_trial = 0;
+	if(isset($_GET['is_trial'])){
+		$is_trial = 1;
+	} ?>
+<div class="payment-box-p page-margin wo_about_page_margin">
+	<div class="pricing_table">
+		<section>
+			<div class="row">   
+				<div class="col-lg-6 col-sm-12 col-md-6">
+					<div class="price-plan-header" style="background: transparent;">
+						<ul class="price-plan-top">
+							<li class="price-table-head">
+								<?php if (!empty($wo['pro_packages'][$type]['image'])) { ?>
+									<div>
+										<img src="<?php echo ($wo['pro_packages'][$type]['image']) ?>" class="pro_packages_icon">
+									</div>
+									<div class="clearfix"></div>
+								<?php } else {
+									if ($wo['pro_packages'][$type]['type'] == 'hot') {
+										echo '<big><i class="fa fa-fire"></i></big>';
+									} else if ($wo['pro_packages'][$type]['type'] == 'ultima') {
+										echo '<big><i class="fa fa-bolt"></i></big>';
+									} else if ($wo['pro_packages'][$type]['type'] == 'vip') {
+										echo '<big><i class="fa fa-rocket"></i></big>';
+									} else {
+										echo '<big><i class="fa fa-star"></i></big>';
+									}
+								} ?>
+								<h3><?php echo Wo_GetCurrency($wo['config']['currency']); ?><?php echo $wo['pro_packages'][$type]['price']; ?></h3>
+								<span><?php
+										if ($wo['pro_packages'][$type]['time'] == 7) {
+											echo $wo['lang']['per_week'];
+										} elseif ($wo['pro_packages'][$type]['time'] == 30) {
+											echo $wo['lang']['per_month'];
+										} elseif ($wo['pro_packages'][$type]['time'] == 365) {
+											echo $wo['lang']['per_year'];
+										} elseif ($wo['pro_packages'][$type]['time'] == 0) {
+											echo $wo['lang']['life_time'];
+										} else {
+											echo $wo['pro_packages'][$type]['time'] . ' ' . $wo['lang']['day'];
+										}
+										?></span>
+							</li>
+							<li class="plan-name"><big><?php echo $wo['lang'][$type]; ?></big></li>
+						</ul>
+
+					</div>
+				</div>
+				<div class="col-lg-6 col-sm-12 col-md-6">
+					<div class="payment-card-box">
+						<form action="" method="POST" class="payment-form" id="payment-form">
+							<?php //if($is_trial == 0){?>
+							<div class="form-row">
+								<div class="col-md-12 form-group form-float">
+									<div class="form-line">
+										<label class="form-label">Discount Code</label>
+										<div class="discount-box">
+											<input type="text" id="discount_code" name="discount_code" class="form-control text-uppercase">
+											<input type="hidden" id="discount_price">
+											<button class="coupon-btn" id="apply-coupon-button">Add Coupon</button>
+											<button class="coupon-btn" id="remove-coupon-button" style="display:none;">Remove Coupon</button>
+										</div>
+										<span class="error error_discount_code text-danger"></span>
+									</div>
+
+								</div>
+							</div>
+							<?php //} ?>
+
+							<div class="form-row">
+								<div class="col-md-12 form-group">
+									<label>Card Number <code>*</code></label>
+									<div class="p-inputbox" id="card-number">
+									</div>
+									<span id="card_number_error" class="card-errors"></span>
+									<span id="card-errors" class="card-errors"></span>
+								</div>
+							</div>
+							
+							<div class="form-row">
+								<div class="col-md-6 form-group">
+									<label>Expiration <code>*</code></label>
+									<div class="p-inputbox" id="card-expiry"></div>
+									<span id="card_exp_error" class="card-errors"></span>
+								</div>
+								<div class="col-md-6 form-group">
+									<label>CVC <code>*</code></label>
+									<div class="p-inputbox" id="card-cvc"></div>
+									<span id="card_cvc_error" class="card-errors"></span>
+								</div>
+								<div class=" col-md-12 form-group">
+									<label>Postcode <code>*</code></label>
+									<div class="p-inputbox" id="card-zip"></div>
+									<span id="card_zipcode_error" class="card-errors"></span>
+								</div>
+							</div>
+
+							<!--<div class="form-row">-->
+							<!--	<div class="col-md-12 form-group">-->
+							<!--		<div class="payment-type-box form-line">-->
+							<!--			<label class="form-label">Payment Type :</label>-->
+							<!--				<div class="payment-type">-->
+							<!--					<label for="one-time">One Time</label>-->
+							<!--					<input type="radio" id="one-time" name="payment_type" value="one-time" checked>-->
+							<!--				</div>-->
+											<!--<div class="payment-type">-->
+												<!--<label for="recurring">Recurring</label>-->
+												<input type="hidden" id="recurring" name="payment_type" value="recurring">
+											<!--</div>-->
+							<!--		</div>-->
+							<!--	</div>-->
+							<!--</div>-->
+
+							<div class="form-row">
+								<div class="col-md-12 form-group">
+									<button id="submit-button" class="pay-btn btn" data-loading-text="Pay <?php echo Wo_GetCurrency($wo['config']['currency']); ?><span class='type_amount'><?php echo $wo['pro_packages'][$type]['price']; ?></span> <i class='fa fa-spinner fa-spin '></i>" type="submit">Pay <?php echo Wo_GetCurrency($wo['config']['currency']); ?><span class="type_amount"><?php echo $wo['pro_packages'][$type]['price']; ?></span></button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="<?php echo Wo_LoadAdminLink('plugins/sweetalert/sweetalert.min.js'); ?>"></script>
+<script>
+	$(document).ready(function() {
+		var stripePublicKey = "<?php echo $wo['config']['stripe_id']; ?>";
+		var stripe = Stripe(stripePublicKey);
+		var elements = stripe.elements();
+
+		var card = elements.create('cardNumber', {
+            showIcon: true
+        });
+		card.mount('#card-number');
+
+		var expiry = elements.create('cardExpiry');
+		expiry.mount('#card-expiry');
+
+		var cvc = elements.create('cardCvc');
+		cvc.mount('#card-cvc');
+
+		var postalCode = elements.create('postalCode');
+		postalCode.mount('#card-zip');
+
+		var form = document.getElementById('payment-form');
+		var cardErrors = document.getElementById('card-errors');
+		var submitButton = document.getElementById('submit-button');
+		// ...
+
+		form.addEventListener('submit', function(event) {
+			event.preventDefault();
+			$('#cardErrors').html('');
+			$('#submit-button').prop('disabled', true);
+			$('#submit-button').button('loading');
+			$('.page_loader').css('display', 'flex');
+
+
+			$('#card_number_error').text('');
+			$('#card_exp_error').text('');
+			$('#card_cvc_error').text('');
+			$('#card_zipcode_error').text('');
+
+			stripe.createPaymentMethod({
+				type: 'card',
+				card: card,
+			}).then(function(result) {
+				if (result.error) {
+					console.log(result);
+					var error_message = result.error.message;
+					if(result.error.code == "incomplete_number"){
+						var errorElmt_id = '#card_number_error';
+					} else if(result.error.code == "incomplete_expiry"){
+						var errorElmt_id = '#card_exp_error';
+					} else if(result.error.code == "incomplete_cvc"){
+						var errorElmt_id = '#card_cvc_error';
+					} else if(result.error.code == "incomplete_zip"){
+						var errorElmt_id = '#card_zipcode_error';
+						error_message = "Your postcode is incomplete.";
+					}
+					$(errorElmt_id).text(error_message);
+					
+					$('#submit-button').prop('disabled', false);
+					$('#submit-button').button('reset');
+					$('.page_loader').css('display', 'none');
+				} else {
+					stripe.createToken(card).then(function(result1) {
+						if (result1.error) {
+							cardErrors.textContent = result1.error.message;
+						} else {
+							handlePaymentMethod(result.paymentMethod.id, result1.token.id);
+						}
+					});
+				}
+			});
+		});
+
+		function handlePaymentMethod(paymentMethodId, tokenId) {
+			var amount = $('.type_amount').html();
+          //var payment_type = $('input[name="payment_type"]:checked').val();
+            var payment_type = $('#recurring').val();
+			var discount_code = $('#discount_code').val();
+			var discount_price = $('#discount_price').val();
+			if (discount_price == '') {
+				discount_code = '';
+			}
+			$.post(Wo_Ajax_Requests_File() + '?f=stripe_payment&pro_type=' + "<?php echo $wo['pro_packages'][$type]['id'] ?>", {
+				payment_method_id: paymentMethodId,
+				token_id: tokenId,
+				amount: amount,
+				payment_type: payment_type,
+				discount_code: discount_code,
+				discount_price: discount_price,
+				before_after_success: "before",
+				is_trial: <?= $is_trial; ?>
+			}, function(data) {
+				if (data.status == 200) {
+					if(data.is_trial == 1){
+						swal({
+							title: 'Payment success !',
+							type: 'success'
+						}, function() {
+							window.location.href = data.location;
+						});
+						$('.page_loader').css('display', 'none');
+					} else {						
+						const clientSecret = data.clientSecret;
+						stripe.confirmCardPayment(clientSecret).then(result => {
+							if (result.error) {
+								console.log(result.error);
+								swal({
+									title: 'Something Went Wrong',
+									type: 'error'
+								});
+								$('#submit-button').prop('disabled', false);
+								$('#submit-button').button('reset');
+								$('.page_loader').css('display', 'none');
+							} else if (result.paymentIntent.status === 'requires_action') {
+								handleAdditionalAuthentication(result.paymentIntent);
+							} else if (result.paymentIntent.status === 'succeeded') {
+								$.post(Wo_Ajax_Requests_File() + '?f=stripe_payment&pro_type=' + "<?php echo $wo['pro_packages'][$type]['id'] ?>", {
+									amount: amount,
+									payment_type: payment_type,
+									discount_code: discount_code,
+									before_after_success: "after",
+									stripe_intent_id:data.stripe_intent_id,
+									stripe_subscription_id:data.stripe_subscription_id
+								}, function(response) {
+									if (response.status == 200) {
+										swal({
+											title: 'Payment success !',
+											type: 'success'
+										}, function() {
+											window.location.href = response.location;
+										});
+									}
+									$('#submit-button').prop('disabled', false);
+									$('#submit-button').button('reset');
+									$('.page_loader').css('display', 'none');
+								});
+							}
+						});
+					}
+				} else {
+					swal({
+						title: data.error,
+						type: 'error'
+					}, function() {
+						window.location.reload();
+					});
+
+					$('#submit-button').prop('disabled', false);
+					$('#submit-button').button('reset');
+					$('.page_loader').css('display', 'none');
+				}
+			});
+		}
+
+		$(document).on('click', '#apply-coupon-button', function(e) {
+			e.preventDefault();
+			$(this).prop('disabled', true);
+			$('.error_discount_code').html('');
+			var code = $('#discount_code').val();
+			var price = '<?php echo $wo['pro_packages'][$type]['price']; ?>';
+			if (code == '') {
+				$('.error_discount_code').html('Enter Discount Code');
+				return false;
+			}
+			$.get(Wo_Ajax_Requests_File() + '?f=apply_discount_coupon&discount_code=' + code + '&price=' + price, function(data) {
+				if (data.status == 200) {
+				    var currency = "<?php echo Wo_GetCurrency($wo['config']['currency']); ?>";
+				    $('#submit-button').data('loading-text', 'Pay '+currency+'<span class="type_amount">'+data.price+'</span> <i class="fa fa-spinner fa-spin"></i>');
+				    $('#submit-button').attr('data-loading-text', 'Pay '+currency+'<span class="type_amount">'+data.price+'</span> <i class="fa fa-spinner fa-spin"></i>');
+					$('.type_amount').html(data.price);
+					$('#discount_price').val(data.discounted_price);
+					$('#apply-coupon-button').hide();
+					$('#remove-coupon-button').show();
+					$('#discount_code').attr('readonly', true);
+				} else if (data.status == 400) {
+					$('.error_discount_code').html(data.error);
+				}
+				$('#apply-coupon-button').attr('disabled', false);
+			});
+		});
+
+		$(document).on('click', '#remove-coupon-button', function(e) {
+			e.preventDefault();
+			
+			var currency = "<?php echo Wo_GetCurrency($wo['config']['currency']); ?>";
+			var price = "<?php echo $wo['pro_packages'][$type]['price']; ?>";
+			
+			$('#discount_code').attr('readonly', false);
+			$('#discount_code').val('');
+			$('#discount_price').val('');
+			$('#apply-coupon-button').show();
+			$('#remove-coupon-button').hide();
+			$('.type_amount').html("<?php echo $wo['pro_packages'][$type]['price']; ?>");
+			$('#submit-button').data('loading-text', 'Pay '+currency+'<span class="type_amount">'+price+'</span> <i class="fa fa-spinner fa-spin"></i>');
+			$('#submit-button').attr('data-loading-text', 'Pay '+currency+'<span class="type_amount">'+price+'</span> <i class="fa fa-spinner fa-spin"></i>');
+		});
+
+
+		$(document).ready(function() {
+			$('#discount_code').on('keypress', function(evt) {
+				if (evt.which == 32) {
+					evt.preventDefault();
+				}
+			});
+		});
+
+	})
+</script>

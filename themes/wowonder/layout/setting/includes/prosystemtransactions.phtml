@@ -1,0 +1,49 @@
+<div class="ads-cont-wrapper">
+	<table class="table table-striped">
+		<thead>
+		  <tr>
+		    <th><b>Name</b></th>
+            <th ><b>Start Date</b></th>
+		    <th><b>End Date</b></th>
+		    <th><b><?= $wo['lang']['amount']; ?></b></th>
+		    <th><b><?= $wo['lang']['status']; ?></b></th>
+		    <th><b>Action</b></th>
+		  </tr>
+		</thead>
+		<tbody id="user-ads">
+		<?php $access_autoconsult = checkAutoConsultAccess(); if (count($wo['trans']) > 0): ?>
+		    <?php foreach ($wo['trans'] as $key => $transaction): ?>
+                <?php //if ($transaction['kind'] == "PRO"){ 
+					$proDetails = json_decode($transaction['plan_details'], true); ?>
+					<tr data-ad-id="<?= $transaction['id']; ?>">
+						<td><span><?= $wo['lang'][$proDetails['type']];?></span></td>
+
+						<td><?= !empty($transaction['transaction_dt']) ? date('Y-m-d', strtotime($transaction['transaction_dt'])) : ''; ?></span></td>
+
+						<td><span><?= !empty($transaction['subscription_end_date']) ? date('Y-m-d', strtotime($transaction['subscription_end_date'])) : ''; ?></span></td>
+
+						<td><span><?= ($transaction['kind'] == 'FREE' ? 'Fre Trial' : Wo_GetCurrency($wo['config']['ads_currency']).$transaction['amount']); ?></span></td>
+						
+						<td><span><?= $transaction['subscription_status'] == 1 && $access_autoconsult ? 'Active' : 'Expired'; ?></span></td>
+
+						<td><?php 
+						    $currentDate = date('Y-m-d H:i:s');
+                            $expireDate = $wo['user']['pro_expire_date'];
+							$checkProExpire = check_differenceDate($currentDate, $expireDate, 'gt');
+							if($key == 0 && ($wo['user']['is_pro'] == '1' && !$checkProExpire)){ ?>
+								<button type="button" id="cancel_subscription" class="btn btn-danger" data-userid="<?= $wo['user']['id'] ?>" data-transactionid="<?= $transaction['id'] ?>">cancel Subscription</button>
+							<?php } else { echo "Expired"; } ?>
+						</td>
+					</tr>
+                <?php //} ?>
+		    <?php endforeach; ?>
+		<?php else: ?>
+			<tr>
+				<td colspan="4" class="text-center" style="height: 200px;">
+					No subscription found
+				</td>
+			</tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+</div>

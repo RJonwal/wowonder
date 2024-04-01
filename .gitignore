@@ -1,0 +1,9 @@
+# Ignore config file
+config.php
+/config.php
+
+function/mysql_functions.php
+/function/mysql_functions.php
+
+function/connectin_config.php
+/function/connectin_config.php

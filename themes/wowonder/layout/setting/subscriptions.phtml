@@ -1,0 +1,77 @@
+<?php 
+$wo['trans'] = Wo_GetMytransactions();
+?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17">
+<style>
+	.custom-swal {
+		width: 500px;
+		/* Adjust the width as per your preference */
+	}
+</style>
+<div class="wo_settings_page">
+	<h3>Subscriptions</h3>
+	<div class="row neg_padd">
+		<div class="tabbable">
+			<?php echo Wo_LoadPage('setting/includes/prosystemtransactions');?>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.17"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+	$(document).on('click', '#cancel_subscription', function(e){
+		e.preventDefault();
+
+		var userid = $(this).data('userid');
+		var transactionid = $(this).data('transactionid');
+
+		Swal.fire({
+			title: 'Do you want to cancel subscription ?',
+			icon: 'info',
+			showCancelButton: true,
+			confirmButtonText: 'Yes',
+			cancelButtonText: 'No',
+			customClass: {
+				popup: 'custom-swal',
+			},
+		}).then((result) => {
+			if (result.isConfirmed) {
+				$.ajax({
+					type: 'POST',
+					url: Wo_Ajax_Requests_File() + '?f=cancel_subscription',
+					data: { userid: userid, transactionid: transactionid },
+					dataType: 'json',
+					success: function(response) {
+						if (response.success) {
+							Swal.fire({
+								title: 'Success!',
+								text: response.message,
+								icon: 'success',
+								showConfirmButton: false,
+							});
+							setTimeout(function() {
+								window.location = "<?php echo $wo['config']['site_url']; ?>";
+							}, 1000);
+
+						} else {
+							Swal.fire({
+								title: 'Error!',
+								text: 'Something Went Wrong',
+								icon: 'error',
+							});
+						}
+					},
+					error: function() {
+						Swal.fire({
+							title: 'Error!',
+							text: 'Something Went Wrong',
+							icon: 'error',
+						});
+					}
+
+				});
+			}
+		});
+	});
+</script>

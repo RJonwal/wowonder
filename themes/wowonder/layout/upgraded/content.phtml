@@ -1,0 +1,22 @@
+<div class="page-margin list-group"> 
+        <?php 
+        $user_pro_type = Wo_GetUserProType();
+        ?>
+   	  <div class="center-container">
+   	    <?php 
+        $string = str_replace('{color}', $user_pro_type['color_name'], $wo['lang']['cong']);
+        $string = str_replace('{icon}', $user_pro_type['icon'], $string);
+        $string = str_replace('{type_name}', $user_pro_type['type_name'], $string);
+        ?>
+        <h2><span style="color:<?php echo $user_pro_type['color_name']; ?>">
+    <?php echo $wo['lang']['pro_con'];?>
+      <?php if (!empty(in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['image']))) { ?>
+            <img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['image']) ?>" class="pro_packages_icon_inline">
+          <?php }else{ ?>
+            <i class="fa fa-<?php echo $user_pro_type['icon'];?> fa-fw"></i> 
+          <?php } ?>
+          <?php echo $user_pro_type['type_name']; ?>
+    </span><br><br></h2>
+        <h4><a href="<?php echo Wo_SeoLink('index.php?link1=welcome');?>" class="btn btn-lg btn-main"><?php echo $wo['lang']['cong_2']?></a></h4>
+      </div>
+</div>

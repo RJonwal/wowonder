@@ -1,0 +1,61 @@
+<div class="container-fluid">
+    <div class="block-header">
+        <h2>Pro System > Manage Discount Code</h2>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="header">
+                    <h2>Manage & Edit Discount Codes</h2> 
+                    <a href="<?php echo Wo_LoadAdminLinkSettings('add-new-discount-code'); ?>" class="btn btn-info waves-effect waves-light m-t-20">Create New Discount Code</a>
+                </div>
+                <div class="body">
+                   <div class="table-responsive1">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                   <th>ID</th>
+					               <!-- <th>Discount Title</th> -->
+					               <th>Code</th>
+					               <th>Discount</th>
+					               <th>Max Uses Per User</th>
+					               <th>Max Uses</th>
+					               <th>Valid From</th>
+					               <th>Valid To</th>
+					               <th>Created At</th>
+					               <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+				                foreach (Wo_GetDiscountCodes() as $wo['discount_code']) {
+				                    echo Wo_LoadAdminPage('manage-discount-code/list');
+				                }
+				                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    </div>
+    <!-- #END# Vertical Layout -->
+<script>
+$(function () {
+  $('table').DataTable();
+});
+function Wo_DeleteDiscountCode(id) { console.log(id);
+  if (id == '') {
+    return false;
+  }
+  if (!confirm('Are you sure you want to delete this discount code?')) {
+    return false;
+  }
+  $('#' + id).fadeOut(300, function () {
+	  $(this).remove();
+	});
+  $.get(Wo_Ajax_Requests_File(), {f: 'admin_setting', s:'delete_discount_code', id:id});
+}
+</script>

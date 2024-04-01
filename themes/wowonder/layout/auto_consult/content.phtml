@@ -1,0 +1,1126 @@
+<div class="page-margin">
+	<div class="row wo_find_friends">
+		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
+		<div class="col-md-7 singlecol">
+			<div class="wo_com_things_head">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+					<path fill="currentColor" d="M15,2C16.94,2 18.59,2.7 19.95,4.05C21.3,5.41 22,7.06 22,9C22,10.56 21.5,11.96 20.58,13.2C19.64,14.43 18.44,15.27 16.97,15.7L17,15.38V15C17,12.81 16.23,10.93 14.65,9.35C13.07,7.77 11.19,7 9,7H8.63L8.3,7.03C8.73,5.56 9.57,4.36 10.8,3.42C12.04,2.5 13.44,2 15,2M9,8A7,7 0 0,1 16,15A7,7 0 0,1 9,22A7,7 0 0,1 2,15A7,7 0 0,1 9,8M9,10A5,5 0 0,0 4,15A5,5 0 0,0 9,20A5,5 0 0,0 14,15A5,5 0 0,0 9,10Z"></path>
+				</svg>
+				<div>
+					<h3><?php echo $wo['lang']['auto_consult'] ?></h3>
+					<p><?php echo $wo['lang']['auto_consult_subtext'] ?></p>
+				</div>
+			</div>
+			<div class="row wo_com_things_row" id="nearby_users_list">
+				<style>
+					#sortable {
+						padding-right: 0;
+					}
+
+					.fa-star {
+						/*color: orange !important;*/
+					}
+
+					.tooltip {
+						z-index: 0;
+						position: relative;
+						display: inline-block;
+					}
+
+					.tooltip .tooltiptext {
+						visibility: hidden;
+						width: 400px;
+						background-color: black;
+						color: #fff;
+						text-align: center;
+						border-radius: 6px;
+						padding: 10px 10px 10px 10px;
+						/* Position the tooltip */
+						position: absolute;
+						z-index: 1;
+						left: 0;
+						top: 20px;
+					}
+
+					.tooltip {
+						z-index: 1;
+						opacity: .75;
+						font-size: 14px;
+					}
+
+					.tooltip:hover .tooltiptext {
+						visibility: visible;
+					}
+
+					ul,
+					.myUL {
+						list-style-type: none;
+					}
+
+					.myUL {
+						margin: 0;
+						padding: 0;
+					}
+
+					.box {
+						cursor: pointer;
+						-webkit-user-select: none;
+						/* Safari 3.1+ */
+						-moz-user-select: none;
+						/* Firefox 2+ */
+						-ms-user-select: none;
+						/* IE 10+ */
+						user-select: none;
+					}
+
+					.box::before {
+						content: "\2610";
+						color: black;
+						display: inline-block;
+						margin-right: 6px;
+					}
+
+					.check-box::before {
+						content: "\2611";
+						color: dodgerblue;
+					}
+
+					.nested {
+						display: none;
+						padding-left: 12px;
+					}
+
+					.active {
+						display: block;
+					}
+
+					.mobile_box {
+						border-style: solid;
+						padding: 20px 20px 20px 20px;
+					}
+
+					i>span {
+						font-family: sans-serif;
+						font-size: 90%;
+					}
+
+					#myUL li {
+						margin-top: 10px;
+					}
+
+					.modal-dialog textarea {
+						max-height: 320px;
+						min-height: 260px !important;
+					}
+				</style>
+				<?php require "function/function.php";
+				$remove_from_fav = 'Remove from favourites';
+				$mark_as_fav = 'Mark as favourite';
+				$userid = $wo['user']['user_id'];
+
+				if (isset($_REQUEST['badd'])) {
+					$data['category_name'] = $_POST['category'];
+					if (isset($_POST['tid']) && $_POST['tid'] != "") {
+						$id = $_POST['tid'];
+						$chk = "SELECT * FROM  category_details WHERE category_name='" . $_POST['category'] . "' and id!='$id' and cby='" . $userid . "' ";
+						$chk = getallrow_fn($chk);
+						if (empty(mysqli_num_rows($chk))) {
+							$data['bgcolor'] = $_POST['cbgcolor'];
+							$updte =	dbRowUpdate("category_details", $data, "where id=" . $id . " and cby=" . $userid);
+							if (!empty($updte)) {
+								$msg = "Category updated Successfully";
+							} else {
+								$msg = "Some Error Occured,please try again...";
+							}
+						} else {
+							$msg = "Category name already exit.";
+						}
+					} else {
+						$chk = getallrow_fn("SELECT * FROM  category_details WHERE category_name='" . $_POST['category'] . "' and cby='" . $userid . "' ");
+						if (!mysqli_num_rows($chk)) {
+							$data['cstatus'] = 1;
+							$data['cby'] = $userid;
+							$data['cip'] = ipAddress();
+							$data['cdate'] = date("Y-m-d H:i:s");
+							$data['bgcolor'] = $_POST['cbgcolor'];
+							$default_dorder = getallrow_fn("SELECT id FROM  category_details WHERE  cby='$userid'");
+							$data['dorder'] = mysqli_num_rows($default_dorder);
+							$insert_value = dbRowInsert("category_details", test_input($data));
+							if (!empty($insert_value)) {
+								$msg = "Category added Successfully";
+							} else {
+								$msg = "Some Error Occured,please try again...";
+							}
+						} else
+							$msg = "Category name is already exist.";
+					}
+					//giveAlert($msg);
+				}
+				if (isset($_REQUEST['bdelete'])) {
+					$id = $_POST['tid'];
+					$tbl = $_POST['table'];
+					if ($tbl == "category_details") {
+
+						$subcategories = getaxecuteQuery_fn("SELECT id FROM category_details WHERE parent_id='$id'");
+
+						while ($sub = mysqli_fetch_assoc($subcategories)) {
+							$sub_id = $sub['id'];
+
+							$subsubcategories = getaxecuteQuery_fn("SELECT id FROM category_details WHERE parent_id='$sub_id'");
+
+							while ($subsub = mysqli_fetch_assoc($subsubcategories)) {
+								$subsub_id = $subsub['id'];
+
+								getaxecuteQuery_fn("DELETE FROM preset_details WHERE cat_id='$subsub_id'");
+								getaxecuteQuery_fn("DELETE FROM category_details WHERE id='$subsub_id'");
+							}
+
+							getaxecuteQuery_fn("DELETE FROM preset_details WHERE cat_id='$sub_id'");
+							getaxecuteQuery_fn("DELETE FROM category_details WHERE id='$sub_id'");
+						}
+
+						getaxecuteQuery_fn("DELETE FROM category_details WHERE id='$id'");
+						getaxecuteQuery_fn("DELETE FROM preset_details WHERE cat_id='$id'");
+
+
+
+						// getaxecuteQuery_fn("delete from " . $tbl . " where id='$id'");
+						// getaxecuteQuery_fn("delete from preset_details where cat_id='$id'");
+					} else
+						getaxecuteQuery_fn("delete from " . $tbl . " where id='$id'");
+					$msg = 'Record Removed.';
+					//giveAlert('Record Removed.');
+					reDirect(getHomeUrl() . "auto_consult");
+				}
+				if (isset($_REQUEST['baddsubcat'])) {
+					$data['category_name'] = $_POST['subcategory'];
+					if (isset($_POST['tid']) && $_POST['tid'] != "") {
+						$id = $_POST['tid'];
+						$chk = getallrow_fn("SELECT * FROM  category_details WHERE category_name='" . $_POST['subcategory'] . "' and id!='$id' and cby='" . $userid . "'");
+						if (empty(mysqli_num_rows($chk))) {
+							$data['bgcolor'] = $_POST['cbgcolor'];
+							$updte =	dbRowUpdate("category_details", $data, "where id=" . $id . " and cby=" . $userid);
+							if (!empty($updte)) {
+								$msg = "Sub category updated Successfully";
+							} else {
+								$msg = "Some Error Occured,please try again...";
+							}
+						} else
+							$msg = "Category name is already exist";
+					} else {
+						$data['parent_id'] = $_POST['cat_id'];
+						$data['bgcolor'] = $_POST['cbgcolor'];
+						$chk = getallrow_fn("SELECT * FROM  category_details WHERE category_name='" . $_POST['subcategory'] . "' and cby='" . $userid . "'");
+						if (empty(mysqli_num_rows($chk))) {
+							$data['cstatus'] = 1;
+							$data['cby'] = $userid;
+							$data['cip'] = ipAddress();
+							$data['cdate'] = date("Y-m-d H:i:s");
+							$default_dorder = getallrow_fn("SELECT id FROM  category_details WHERE   cby='$userid' and parent_id='" . $_POST['cat_id'] . "'");
+							$data['dorder'] = mysqli_num_rows($default_dorder);
+							$insert_value = dbRowInsert("category_details", test_input($data));
+							if (!empty($insert_value)) {
+								$msg = "Sub category added Successfully";
+							} else {
+								$msg = "Some Error Occured,please try again...";
+							}
+						} else
+							$msg = "Category name is already exist";
+					}
+					//giveAlert($msg);
+					// reDirect(getHomeUrl() . "auto_consult");
+				}
+				if (isset($_REQUEST['baddpreset'])) {
+					// echo "<pre>";print_r($_POST);die;
+					$shortcode = $_POST['short_code'];
+					$data['presettxt'] = $_POST['presettxt'];
+					if (isset($_POST['tid']) && $_POST['tid'] != "") {
+
+						$id = $_POST['tid'];
+						$chk = getallrow_fn("SELECT * FROM  preset_details WHERE presettxt='" . $_POST['presettxt'] . "' and  id!='$id' and cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "'");
+						if (empty(mysqli_num_rows($chk))) {
+
+							$shortCodeVerified = true;
+							if (!empty($shortcode)) {
+								$chkShortCode = getallrow_fn("SELECT * FROM  preset_details WHERE short_code='" . $shortcode . "' and id!='$id' and cby='" . $userid . "'");
+								if (mysqli_num_rows($chkShortCode) > 0) {
+									$shortCodeVerified = false;
+								}
+							}
+							if ($shortCodeVerified) {
+								//$data['cdate'] = date("Y-m-d H:i:s");
+								$data['short_code'] = empty($shortcode) ? null : $shortcode;
+								$updte =	dbRowUpdate("preset_details", test_input($data), "where id=" . $id . " and cby=" . $userid);
+								if (!empty($updte)) {
+									$msg = "Preset updated Successfully";
+								} else {
+									$msg = "Some Error Occured,please try again...";
+								}
+							} else {
+								$msg = "Short code is already exist";
+							}
+						} else {
+							$msg = "Preset is already exist";
+						}
+					} else {
+						$data['cat_id'] = $_POST['cat_id'];
+						$chk = getallrow_fn("SELECT * FROM  preset_details WHERE presettxt='" . $_POST['presettxt'] . "' and cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "'");
+						if (empty(mysqli_num_rows($chk))) {
+
+							$shortCodeVerified = true;
+							if (!empty($shortcode)) {
+								$chkShortCode = getallrow_fn("SELECT * FROM  preset_details WHERE short_code='" . $shortcode . "' and id!='$id' and cby='" . $userid . "'");
+								if (mysqli_num_rows($chkShortCode) > 0) {
+									$shortCodeVerified = false;
+								}
+							}
+
+							if ($shortCodeVerified) {
+								$data['cstatus'] = 1;
+								$data['cby'] = $userid;
+								$data['cip'] = ipAddress();
+								$data['cdate'] = date("Y-m-d H:i:s");
+								$data['short_code'] = empty($shortcode) ? null : $shortcode;
+								$default_dorder = getallrow_fn("SELECT id FROM  preset_details WHERE  cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "'");
+								$data['dorder'] = mysqli_num_rows($default_dorder);
+								$insert_value = dbRowInsert("preset_details", test_input($data));
+								if (!empty($insert_value)) {
+									$msg = "Preset added Successfully";
+								} else {
+									$msg = "Some Error Occured,please try again...";
+								}
+							} else {
+								$msg = "Short code is already exist";
+							}
+						} else
+							$msg = "Preset is already exist";
+					}
+					//giveAlert($msg);
+					// reDirect(getHomeUrl() . "auto_consult");
+				}
+				if (isset($_GET['fav'])) {
+					$id = $_GET['fav'];
+					$chk = getallrow_fn("SELECT * FROM  category_details WHERE id='" . $_GET['fav'] . "' and cby='$userid' limit 1");
+					if (mysqli_num_rows($chk)) {
+						$row = mysqli_fetch_assoc($chk);
+						$mrk = $row['mark_favourite'] == 1 ? 0 : 1;
+						$updte =	dbRowUpdate("category_details", array("mark_favourite" => $mrk), "where id=" . $id . " and cby=" . $userid);
+						if (!empty($updte)) {
+							$msg = $row['mark_favourite'] == 1 ? 'Removed from favourite list.' : 'Added in favourite list.';
+						} else {
+							$msg = "Some Error Occured,please try again...";
+						}
+					} else {
+						$msg = "Some Error Occured,please try again...";
+					}
+					//giveAlert($msg);
+					reDirect(getHomeUrl() . "auto_consult");
+				}
+				if (isset($_GET['pfav'])) {
+					$id = $_GET['pfav'];
+					$chk = getallrow_fn("SELECT * FROM  preset_details WHERE id='" . $_GET['pfav'] . "' and cby='$userid' limit 1");
+					if (mysqli_num_rows($chk)) {
+						$row = mysqli_fetch_assoc($chk);
+						$mrk = $row['mark_favourite'] == 1 ? 0 : 1;
+						$updte =	dbRowUpdate("preset_details", array("mark_favourite" => $mrk), "where id=" . $id . " and cby=" . $userid);
+						if (!empty($updte)) {
+							$msg = $row['mark_favourite'] == 1 ? 'Removed from favourite list.' : 'Added in favourite list.';
+						} else {
+							$msg = "Some Error Occured,please try again...";
+						}
+					} else {
+						$msg = "Some Error Occured,please try again...";
+					}
+					//giveAlert($msg);
+					reDirect(getHomeUrl() . "auto_consult");
+				}
+				?>
+				<div class="containers">
+					<div class="row">
+						<?php if (strlen($msg) > 0) { ?><div class="class=" label label-info""><?php echo $msg; ?></div> <br><br><?php } ?>
+						<div class="col-md-2">
+							<button class="btn btn-info" onclick="addcategory()">Add Category</button>
+						</div>
+						<div class="col-md-2">
+							<button class="btn btn-info" onclick="favouritelist()">Favourites</button>
+						</div>
+					</div>
+				</div>
+				<div class="containers" style="padding-top: 20px;">
+					<div class="row">
+						<div class="col-md-7" id="sortable">
+							<?php
+							$getcategory = getallrow_fn("select * from category_details where parent_id='0' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+							if (mysqli_num_rows($getcategory)) {
+							?>
+								<ul class="myUL" id="myUL">
+									<?php
+									$getcategorydata = array();
+									while ($row_getcategorydata = mysqli_fetch_assoc($getcategory)) {
+										$getcategorydata[] = $row_getcategorydata;
+									}
+									$getcategorydata[] = array(
+										"id" => 0,
+										"category_name" => "Others",
+										"parent_id" => 0,
+										"mark_favourite" => 0,
+										"dorder" => 10000000,
+										"bgcolor" => "#000000"
+									);
+									//print_r($getcategorydata);
+									foreach ($getcategorydata as $row_getcategory) {
+										$id = $row_getcategory['id'];
+										$mrk = $row_getcategory['mark_favourite'];
+										$cat = $row_getcategory['category_name'];
+										$bgcolor = $row_getcategory['bgcolor'];
+										$dorder = $row_getcategory['dorder'];
+									?>
+										<li class="cat<?php echo $id; ?>" id="<?php echo $id; ?>">
+											<span class="box"><?php echo $cat; ?></span>
+											<?php if (!empty($id)) { ?>
+												<div class="pull-right">
+													<i class="fa fa-pencil" title="Edit category" onclick="editcategory('<?php echo $id; ?>','<?php echo $cat; ?>')"></i>&nbsp;&nbsp;
+													<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;
+													<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;
+													<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i>
+												</div>
+											<?php } ?>
+											<ul class='nested'>
+												<?php
+												$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												
+												if (mysqli_num_rows($getpreset)) {
+													while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
+														$dorder = $row_getpreset['dorder'];
+														$pid = $row_getpreset['id'];
+														$cat_id = $row_getpreset['cat_id'];
+														$preset = $row_getpreset['presettxt'];
+														$psc = $row_getpreset['short_code'];
+														$mrk = $row_getpreset['mark_favourite'];
+												?>
+														<li id="<?php echo $pid; ?>" data-type="preset">
+															<span style="color:green" onclick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
+																<div class="tooltip 303"><i class="fa fa-plus-circle line308">&nbsp;&nbsp;</i><span class="tooltiptext"><?php echo $preset; ?></span></div>
+																<span><?php echo limit_text($preset); ?></span>
+															</span>
+															<div class="pull-right" style="padding-right:20px;"><i class="fa fa-pencil" title="Edit Preset" onclick="editpreset('<?php echo $pid; ?>','<?php echo substr(json_encode($preset), 1, -1); ?>','<?php echo $psc; ?>', <?= $cat_id ?>)"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove Preset" onclick="deleterecord('<?php echo $pid; ?>','preset_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?pfav=<?php echo $pid; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i> </div>
+														</li>
+												<?php
+													}
+												} else {
+													echo '<li class="add-preset-li"><i class="fa fa-plus-circle" style="color:green">&nbsp;&nbsp;<span>Add Preset Here.</span> </i></>';
+												}
+												?>
+												<?php
+												$getsubcat = getallrow_fn("select * from category_details where parent_id='$id' and parent_id!='0' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												if (mysqli_num_rows($getsubcat)) {
+													while ($row_getsubcat = mysqli_fetch_assoc($getsubcat)) {
+														$id = $row_getsubcat['id'];
+														$scat = $row_getsubcat['category_name'];
+														$pid = $row_getsubcat['parent_id'];
+														$mrk = $row_getsubcat['mark_favourite'];
+														$bgcolor = $row_getsubcat['bgcolor'];
+												?>
+														<li class="cat<?php echo $id; ?>" id="<?php echo $id; ?>">
+															<span class="box"><?php echo $scat; ?></span>
+															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onclick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i></div>
+															<?php
+															echo "<ul class='nested'  id='" . $id . "'>";
+															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+															if (mysqli_num_rows($getpreset)) {
+																while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
+																	$pid = $row_getpreset['id'];
+																	$cat_id = $row_getpreset['cat_id'];
+																	$preset = $row_getpreset['presettxt'];
+																	$psc = $row_getpreset['short_code'];
+																	$mrk = $row_getpreset['mark_favourite'];
+															?>
+														<li id="<?php echo $pid; ?>" data-type="preset">
+															<span style="color:green" onclick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
+																<div class="tooltip 342"><i class="fa fa-plus-circle line346">&nbsp;&nbsp;</i>
+																	<span class="tooltiptext"><?php echo $preset; ?></span>
+																</div>
+																<span><?php echo limit_text($preset); ?></span>
+															</span>
+															<div class="pull-right" style="padding-right:20px;"><i class="fa fa-pencil" title="Edit Preset" onclick="editpreset('<?php echo $pid; ?>','<?php echo substr(json_encode($preset), 1, -1); ?>','<?php echo $psc; ?>', <?= $cat_id ?>)"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove Preset" onclick="deleterecord('<?php echo $pid; ?>','preset_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?pfav=<?php echo $pid; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i> </div>
+														</li>
+													<?php
+																}
+															} else {
+																echo '<li class="add-preset-li"><i class="fa fa-plus-circle" style="color:green">&nbsp;&nbsp;<span>Add Preset Here.</span> </i></>';
+															}
+															//3rd Level Category
+															$getsubcat3 = getallrow_fn("select * from category_details where parent_id='$id' and cby='" . $userid . "' and parent_id!='0' order by category_name desc");
+															if (mysqli_num_rows($getsubcat3)) {
+																while ($row_getsubcat3 = mysqli_fetch_assoc($getsubcat3)) {
+																	$id = $row_getsubcat3['id'];
+																	$scat = $row_getsubcat3['category_name'];
+																	$pid = $row_getsubcat3['parent_id'];
+																	$mrk = $row_getsubcat3['mark_favourite'];
+													?>
+														<li class="3">
+															<span class="box"><?php echo $scat; ?></span>
+															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
+															<?php
+																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+																	if (mysqli_num_rows($getpreset3)) {
+															?>
+																<ul class='nested' id="<?php echo $id; ?>">
+																	<?php
+																		while ($row_getpreset3 = mysqli_fetch_assoc($getpreset3)) {
+																			// print_r($row_getpreset3);
+																			$pid = $row_getpreset3['id'];
+																			$cat_id = $row_getpreset3['cat_id'];
+																			$preset = $row_getpreset3['presettxt'];
+																			$psc = $row_getpreset3['short_code'];
+																			$mrk = $row_getpreset3['mark_favourite'];
+																	?>
+																		<li class="4">
+																			<span style="color:green" onClick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
+																				<div class="tooltip 377">
+																					<i class="fa fa-plus-circle line382">&nbsp;&nbsp;</i>
+																					<span class="tooltiptext"><?php echo $preset; ?></span>
+																				</div><span><?php echo limit_text($preset); ?></span>
+																			</span>
+																			<div class="pull-right" style="padding-right:20px;">
+																				<i class="fa fa-pencil" title="Edit Preset" onclick="editpreset('<?php echo $pid; ?>','<?php echo substr(json_encode($preset), 1, -1); ?>','<?php echo $psc; ?>', <?= $cat_id ?>)"></i>
+																				&nbsp;&nbsp;
+																				<i class="fa fa-trash" title="Remove Preset" onClick="deleterecord('<?= $pid; ?>','preset_details')"></i>
+																				&nbsp;&nbsp;
+																				<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?pfav=<?php echo $pid; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>
+																			</div>
+																		</li>
+																	<?php
+																		} ?>
+																</ul>
+															<?php } else {
+																		echo '<li class="add-preset-li"><i class="fa fa-plus-circle" style="color:green">&nbsp;&nbsp;<span>Add Preset Here.</span> </i></>';
+																	}
+															?>
+														</li>
+												<?php
+																}
+															}
+															echo "</ul>";
+												?>
+										</li>
+								<?php
+													}
+												}
+												echo "</ul>";
+								?>
+								</li>
+						<?php
+									}
+									echo '</ul>';
+								} else {
+									echo "No record found.";
+								}
+						?>
+						</div>
+						<div class="col-md-5 auto_consult_right_block">
+							<div class="" id="content">
+								<textarea class="form-control" rows="6" id="tcontent" oninput="save_txt_data()" placeholder="Use '#' for short codes"></textarea>
+							</div>
+							<p id="cpymsg"></p>
+							<button class="btn btn-primary pull-right" id="btncopy" onclick="copyToClipboard()"><i class="fa fa-copy"></i>&nbsp;&nbsp;Copy</button>
+							<input type="button" style="display: none;" id="focus_textarea" onclick="fx(document.getElementsByTagName('textarea')[0])" />
+						</div>
+					</div>
+				</div>
+				<!-- Modal -->
+				<div class="modal fade" id="add_category" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title" id="pophead">Add Category</h4>
+							</div>
+							<div class="modal-body">
+								<form action="" method="POST">
+									<div class="form-group">
+										<label for="email">Category:</label>
+										<input type="hidden" name="tid" id="tid">
+										<input type="text" name="category" id="category" class="form-control" placeholder="Enter category name" required>
+										<input type="color" name="cbgcolor" id="cbgcolor" class="form-control" required>
+									</div>
+									<button type="submit" class="btn btn-primary" name="badd">Submit</button>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Modal -->
+				<div class="modal fade" id="add_subcategory" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title" id="popsubhead">Add Sub Category</h4>
+							</div>
+							<div class="modal-body">
+								<form action="" method="POST">
+									<div class="form-group">
+										<label for="email">Sub Category:</label>
+										<input type="hidden" name="cat_id" id="cat_id">
+										<input type="hidden" name="tid" id="stid">
+										<input type="text" name="subcategory" id="subcategory" class="form-control" placeholder="Enter Sub category name" required>
+										<input type="color" name="cbgcolor" id="cbgcolor" class="form-control" required>
+									</div>
+									<button type="submit" class="btn btn-primary" name="baddsubcat">Submit</button>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Modal -->
+				<div class="modal fade" id="add_preset" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title" id="poppresethead">Add Preset</h4>
+							</div>
+							<div class="modal-body">
+								<form action="" method="POST">
+									<div class="form-group">
+										<label for="email">Preset:</label>
+										<input type="hidden" name="cat_id" id="pcat_id">
+										<input type="hidden" name="tid" id="ptid">
+										<textarea name="presettxt" id="presettxt" class="form-control" placeholder="Enter Preset here" required></textarea>
+									</div>
+									<div class="form-group">
+										<label for="email">Short code:</label>
+										<input type="text" class="form-control" name="short_code" id="short_code" placeholder="Enter short code here">
+									</div>
+									<button type="submit" class="btn btn-primary" name="baddpreset">Submit</button>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="favourite_list" role="dialog">
+					<div class="modal-dialog modal-lg">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title" id="poppresethead">Favourites List</h4>
+							</div>
+							<div class="modal-body">
+								<div class="container">
+									<div class="row">
+										<div class="col-md-10">
+											<ul class=''>
+												<?php
+												$getpreset = getallrow_fn("select * from preset_details where mark_favourite='1' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												if (mysqli_num_rows($getpreset)) {
+													while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
+														$pid = $row_getpreset['id'];
+														$cat_id = $row_getpreset['cat_id'];
+														$preset = $row_getpreset['presettxt'];
+														$mrk = $row_getpreset['mark_favourite'];
+												?>
+														<li>
+															<span style="color:green" onclick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
+																<div class="tooltip 530">
+																	<i class="fa fa-plus-circle line551">&nbsp;&nbsp;</i>
+																	<span class="tooltiptext"><?php echo $preset; ?></span>
+																</div><span><?php echo limit_text($preset); ?></span>
+															</span>
+															<div class="pull-right" style="padding-right:20px;"><i class="fa fa-trash" title="Remove Preset" onclick="deleterecord('<?php echo $pid; ?>','preset_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?pfav=<?php echo $pid; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i> </div>
+														</li>
+												<?php
+													}
+												}
+												?>
+												<?php
+												$getsubcat = getallrow_fn("select * from category_details where parent_id='$id' and parent_id!='0' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												if (mysqli_num_rows($getsubcat)) {
+													//echo "<ul class='nested'>";
+													while ($row_getsubcat = mysqli_fetch_assoc($getsubcat)) {
+														$id = $row_getsubcat['id'];
+														$scat = $row_getsubcat['category_name'];
+														$pid = $row_getsubcat['parent_id'];
+														$mrk = $row_getsubcat['mark_favourite'];
+												?>
+														<li> <span class="box"><?php echo $scat; ?></span>
+															<div class="pull-right"><i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i></div>
+															<?php
+															echo "<ul class='nested'>";
+															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+															if (mysqli_num_rows($getpreset)) {
+																while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
+																	$pid = $row_getpreset['id'];
+																	$cat_id = $row_getpreset['cat_id'];
+																	$preset = $row_getpreset['presettxt'];
+																	$mrk = $row_getpreset['mark_favourite'];
+															?>
+														<li> <i class="fa fa-plus-circle line587" style="color:green" onclick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">&nbsp;&nbsp;<span><?php echo $preset; ?></span></i>
+															<div class="pull-right" style="padding-right:20px;"><i class="fa fa-trash" title="Remove Preset" onclick="deleterecord('<?php echo $pid; ?>','preset_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?pfav=<?php echo $pid; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i> </div>
+														</li>
+													<?php
+																}
+															}
+															//3rd Level Category
+															$getsubcat3 = getallrow_fn("select * from category_details where parent_id='$id' and cby='" . $userid . "' and parent_id!='0' order by category_name desc");
+															if (mysqli_num_rows($getsubcat3)) {
+																while ($row_getsubcat3 = mysqli_fetch_assoc($getsubcat3)) {
+																	$id = $row_getsubcat3['id'];
+																	$scat = $row_getsubcat3['category_name'] . "C";
+																	$pid = $row_getsubcat3['parent_id'];
+																	$mrk = $row_getsubcat3['mark_favourite'];
+													?>
+														<li class="3">
+															<span class="box"><?php echo $scat; ?></span>
+															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-square" title="Add Sub category" onClick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
+															<?php
+																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+																	if (mysqli_num_rows($getpreset3)) {
+															?>
+																<ul class='nested'>
+																	<?php
+																		while ($row_getpreset3 = mysqli_fetch_assoc($getpreset3)) {
+																			$pid = $row_getpreset3['id'];
+																			$cat_id = $row_getpreset3['cat_id'];
+																			$preset = $row_getpreset3['presettxt'];
+																			$psc = $row_getpreset3['short_code'];
+																			$mrk = $row_getpreset3['mark_favourite'];
+																	?>
+																		<li class="4">
+																			<span style="color:green" onClick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
+																				<div class="tooltip 594">
+																					<i class="fa fa-plus-circle line624">&nbsp;&nbsp;</i>
+																					<span class="tooltiptext"><?php echo $preset; ?></span>
+																				</div><span><?php echo limit_text($preset); ?></span>
+																			</span>
+																			<div class="pull-right" style="padding-right:20px;"><i class="fa fa-pencil" title="Edit Preset" onClick="editpreset('<?php echo $pid; ?>','<?php echo substr(json_encode($preset), 1, -1); ?>','<?php echo $psc; ?>', <?= $cat_id ?>)"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove Preset" onClick="deleterecord('<?php echo $pid; ?>','preset_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?pfav=<?php echo $pid; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>
+																			</div>
+																		</li>
+																	<?php
+																		} ?>
+																</ul>
+															<?php }
+															?>
+														</li>
+													<?php
+																} ?>
+												<?php }
+															echo "</ul>";
+												?>
+												</li>
+										<?php
+													}
+													echo "</ul>";
+												}
+										?>
+										</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Modal -->
+				<div class="modal fade" id="delete" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-body">
+								<form action="" method="POST">
+									<p style="text-align: center;">Are you sure,you want to remove this record?</p>
+									<div class="form-group">
+										<input type="hidden" name="tid" id="did">
+										<input type="hidden" name="table" id="tablenm">
+									</div>
+									<center>
+										<button type="submit" class="btn btn-danger" name="bdelete">Yes</button>
+										<button type="submit" class="btn btn-warning" name="badd" data-dismiss="modal">No</button>
+									</center>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+				<script>
+					$(function() {
+						/*
+						$('#12 ul li').each(function(i, li) {
+						var $product = $(li);
+							console.log($product.attr('id'));
+						});
+						*/
+						$("#sortable ul").sortable({
+							connectWith: "#sortable ul",
+							tolerance: 'pointer',
+							cancel: '.add-preset-li',
+							update: function(event, ui) {
+								var dorder = ui.item.index();
+								var id = ui.item.attr("id");
+								var data_type = ui.item.attr("data-type");
+								var ul_id = ui.item.closest('li').attr("id");
+								var ul_id_ul = ui.item.closest('ul').attr("id");
+								
+								if (ul_id_ul === 'myUL' && data_type == 'preset') {
+									$(this).sortable('cancel');
+									return;
+								}
+								
+								if (data_type == 'preset') {
+									var ul_id = ul_id_ul;
+									if (!ul_id_ul) {
+										var ul_id = (ui.item.parent().closest('li').attr("id"));
+									}
+								} else {
+									if (!ul_id_ul) {
+										var ul_id = (ui.item.parent().closest('li').attr("id"));
+									}
+								}
+								var selectid = ul_id;
+								if (id == ul_id) {
+									var selectid = "sortable";
+								}
+								console.log(selectid);
+								//Reetting all order
+								$('#' + selectid + '>ul>li').each(function(i, li) {
+									var $product = $(li);
+									//console.log($product.attr('id'));
+									var id = $product.attr("id");
+									if (selectid == "sortable") {
+										ul_id = id;
+									}
+									var dorder = $product.index();
+									var data_type = $product.attr("data-type");
+									$.post("function/function.php", {
+											action: "update_dorder",
+											catid: id,
+											dorder: dorder,
+											ul_id: ul_id,
+											data_type: data_type
+										},
+										function(data, status) {
+											//console.log(data);
+											//alert("Data: " + data + "\nStatus: " + status);
+										});
+								});
+								console.log('update: ' + ui.item.index());
+							},
+							start: function(event, ui) {
+								console.log('start: ' + ui.item.index())
+							}
+						});
+						$("#sortable ul").disableSelection();
+					});
+				</script>
+				<script>
+					var toggler = document.getElementsByClassName("box");
+					var i;
+					for (i = 0; i < toggler.length; i++) {
+						toggler[i].addEventListener("click", function() {
+							this.parentElement.querySelector(".nested").classList.toggle("active");
+							this.classList.toggle("check-box");
+							check_ids();
+						});
+					}
+
+					function addcategory() {
+						$("#pophead").html("Add Category")
+						$("#tid").val("")
+						$("#category").val("")
+						$("#add_category").modal()
+					}
+
+					function favouritelist() {
+						$("#favourite_list").modal()
+					}
+
+					function editcategory(id, category) {
+						$("#pophead").html("Edit Category")
+						$("#tid").val(id)
+						$("#category").val(category)
+						$("#add_category").modal()
+					}
+
+					function deleterecord(id, table) {
+						// alert(id);
+						$("#did").val(id)
+						$("#tablenm").val(table)
+						$("#delete").modal()
+					}
+
+					function addsubcategory(cat_id) {
+						$("#popsubhead").html("Add Sub Category")
+						$("#cat_id").val(cat_id)
+						$("#add_subcategory").modal()
+					}
+
+					function editsubcategory(id, category, cat_id) {
+						$("#popsubhead").html("Edit sub Category")
+						$("#stid").val(id)
+						$("#cat_id").val(cat_id)
+						$("#subcategory").val(category)
+						$("#add_subcategory").modal()
+					}
+
+					function addpreset(cat_id) {
+						$("#poppresethead").html("Add Preset")
+						$("#pcat_id").val(cat_id)
+						$("#ptid").val('')
+						$("#presettxt").val('')
+						$('#short_code').val('')
+						$("#add_preset").modal()
+					}
+
+					function editpreset(pid, preset, psc, pcat_id) {
+						$("#poppresethead").html("Edit Preset")
+						$("#ptid").val(pid)
+						$("#presettxt").val(preset)
+						$('#short_code').val(psc)
+						$("#pcat_id").val(cat_id)
+						$("#add_preset").modal()
+					}
+
+					$(document).on('input', '#short_code', function(e) {
+						var currentValue = $(this).val();
+						var modifiedValue = currentValue.replace(/[#\s]/g, '');
+
+						$(this).val(modifiedValue);
+					});
+
+					function insertAtCaret(areaId, text) {
+						text = $('<div/>').html(text).text();
+						var $txtarea = $("#" + areaId);
+						if ($txtarea.length === 0) {
+							return;
+						}
+
+						var scrollPos = $txtarea.scrollTop();
+						var strPos = 0;
+						var br = ($txtarea.prop("selectionStart") || $txtarea.prop("selectionStart") === 0) ?
+							"ff" : ($.browser.msie ? "ie" : false);
+						if (br == "ie") {
+							$txtarea.focus();
+							var range = document.selection.createRange();
+							range.moveStart('character', -$txtarea.val().length);
+							strPos = range.text.length;
+						} else if (br == "ff") {
+							strPos = $txtarea.prop("selectionStart");
+						}
+
+						var front = $txtarea.val().substring(0, strPos);
+						var back = $txtarea.val().substring(strPos, $txtarea.val().length);
+						$txtarea.val(front + text + back);
+						strPos = strPos + text.length;
+						if (br == "ie") {
+							$txtarea.focus();
+							var ieRange = document.selection.createRange();
+							ieRange.moveStart('character', -$txtarea.val().length);
+							ieRange.moveStart('character', strPos);
+							ieRange.moveEnd('character', 0);
+							ieRange.select();
+						} else if (br == "ff") {
+							$txtarea.prop("selectionStart", strPos);
+							$txtarea.prop("selectionEnd", strPos);
+							$txtarea.focus();
+						}
+
+						$txtarea.scrollTop(scrollPos);
+					}
+
+					function addtextinbox(preset) {
+						const txtToAdd = "\n" + escapeHtml(preset);
+						if ($("#tcontent").is(":focus")) {
+							insertAtCaret('tcontent', txtToAdd);
+
+							/* setTimeout(function() {
+								$("#focus_textarea").click();
+							}, 1000); */
+							save_txt_data();
+						} else {
+							var txt = ($("#tcontent").val());
+							var html = (txt) + "\n" + escapeHtml(preset);
+							$("#tcontent").val(htmlDecode(html));
+							setTimeout(function() {
+								$("#focus_textarea").click();
+							}, 3000);
+							save_txt_data();
+						}
+
+					}
+
+					function htmlDecode(input) {
+						var e = document.createElement('div');
+						e.innerHTML = input;
+						return e.childNodes[0].nodeValue;
+					}
+
+
+					function copyToClipboard() {
+						$("#tcontent").select();
+						document.execCommand('copy');
+						$("#cpymsg").html("Copied.")
+					}
+
+					function fx(element) {
+						element.focus();
+						element.setSelectionRange(element.value.length, element.value.length);
+					}
+					$(document).ready(function() {
+						if ($("#tcontent").val() == "") {
+							$("#tcontent").val(localStorage.getItem("auto_consult_textarea"));
+						}
+						//Checking Open Items
+						var i;
+						var old_cat_ids = JSON.parse(localStorage.getItem("catids"));
+						for (i = 0; i < old_cat_ids.length; ++i) {
+							if (old_cat_ids[i] > 0) {
+								//console.log(old_cat_ids[i])
+								//$("#"+old_cat_ids[i]+">span").addClass("check-box");
+								$(".cat" + old_cat_ids[i] + ">span").addClass("check-box");
+							}
+						}
+						$('.check-box').each(function() {
+							this.parentElement.querySelector(".nested").classList.toggle("active");
+						});
+					});
+
+					function save_txt_data() {
+						localStorage.setItem("auto_consult_textarea", $("#tcontent").val());
+					}
+
+					function check_ids() {
+						var catids = [];
+						$('.check-box').each(function() {
+							//console.log("Checked");
+							var cat_id = $(this).closest("li").attr('id');
+							//console.log(cat_id);
+							//console.log(catids.length);
+							//var catids = catids;
+							catids[cat_id] = cat_id;
+							localStorage.setItem("catids", JSON.stringify(catids));
+						});
+					}
+
+					function escapeHtml(text) {
+						var map = {
+							'&': '&amp;',
+							'<': '&lt;',
+							'>': '&gt;',
+							'"': '&quot;',
+							"'": '&#039;',
+							"''": '&#039;'
+						};
+						return text.replace(/[&<>"']/g, function(m) {
+							return map[m];
+						});
+					}
+					var timeout;
+					$(document).on('input', '#tcontent', function(e) {
+
+						var text = $(e.target).val();
+						if (timeout) {
+							clearTimeout(timeout);
+						}
+
+						timeout = setTimeout(function(event) {
+							getShortCode(text);
+						}, 800);
+					});
+
+					function getShortCode(text) {
+
+						var textarea = document.getElementById("tcontent");
+
+						// Get the text content of the textarea
+						var text = textarea.value;
+
+						// Get the cursor position
+						var cursorPosition = textarea.selectionEnd;
+
+						// Extract the substring that represents the text before the cursor position
+						var textBeforeCursor = text.substring(0, cursorPosition);
+
+						var lastHashtagIndex = textBeforeCursor.lastIndexOf("#");
+						var lastHashtagValue = 'false'
+						if (lastHashtagIndex !== -1) {
+							var lastHashtag = textBeforeCursor.substring(lastHashtagIndex);
+							var lastHashtagValue = lastHashtag.match(/#(\w+)/)[1];
+						}
+
+						if (lastHashtagValue != 'false') {
+							var lastHashTagLen = lastHashtagValue.length;
+							var lastHashtagIndex = text.lastIndexOf("#" + lastHashtagValue);
+							if (lastHashtagIndex !== -1) {
+								var textAfterLastHashtag = text.substring(lastHashtagIndex + (lastHashTagLen + 1));
+							}
+
+							$.ajax({
+								url: Wo_Ajax_Requests_File(),
+								method: 'GET',
+								data: {
+									f: "get-short-codes",
+									text: text
+								},
+								dataType: 'json',
+								success: function(response) {
+									if (response.status) {
+										var updatedText = $('#tcontent').val();
+										var remainingText = updatedText.substr(text.length);
+
+										var newText = response.content + remainingText;
+
+										var decodedString = $('<div/>').html(newText).text();
+
+										$('#tcontent').val(decodedString);
+										save_txt_data();
+
+										var newTextTotalLength = newText.length;
+										var textAfterLastHashtagTotalLength = textAfterLastHashtag.length;
+
+										var position = newTextTotalLength - textAfterLastHashtagTotalLength;
+
+										restoreCursorPosition(position);
+										/* setTimeout(() => {
+											var newTextTotalLength = newText.length; 
+											var textAfterLastHashtagTotalLength = textAfterLastHashtag.length; 
+
+											var position = newTextTotalLength - textAfterLastHashtagTotalLength;
+
+											restoreCursorPosition(position);
+										}, 200); */
+									}
+
+								}
+							});
+						}
+					}
+
+					// Restore the cursor position
+					function restoreCursorPosition(cursorPosition) {
+						var element = $('#tcontent');
+						element[0].setSelectionRange(cursorPosition, cursorPosition);
+					}
+				</script>
+			</div>
+		</div>
+	</div>
+	<!-- .row -->
+</div>

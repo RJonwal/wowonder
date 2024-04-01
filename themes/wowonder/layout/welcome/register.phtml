@@ -1,0 +1,172 @@
+<?php 
+echo Wo_LoadPage('welcome/welcome-header');
+$fields = Wo_GetWelcomeFileds();
+
+//print_r($_SESSION);
+
+if(!empty($_REQUEST["custom_utype"]))
+{	
+$_SESSION['custom_utype']=$_REQUEST["custom_utype"];
+	
+}
+
+?>
+<style>
+body{background:none !important;}
+body{
+	background-image:url(<?php echo $wo['config']['theme_url'];?>/img/back.jpg) !important;
+	background-repeat:no-repeat !important;
+	background-size:cover !important;
+}
+body:before{content:none;}
+.left_text ul{
+	margin:50px 0 0 0;
+	padding:0px;
+}
+.left_text ul li{
+	font-size:18px;
+	color:#fff;
+	margin:0 0 15px 0;
+}
+.left_text ul li img{margin:0 10px 0 0;}
+</style>
+<div class="wrapper">
+<div class="typing-element"></div>
+<div class="container"><div class="row">
+      <div class="col-md-6">
+      <div class="left_text">
+      <img src="<?php echo $wo['config']['theme_url'];?>/img/logo.png">
+      <ul>
+<li><img src="<?php echo $wo['config']['theme_url'];?>/img/group.png"> Connect with your colleagues</li>
+      <li><img src="<?php echo $wo['config']['theme_url'];?>/img/search.png"> Discover and store new resources</li>
+      <li><img src="<?php echo $wo['config']['theme_url'];?>/img/thoughts.png"> Share your ideas, thoughts and queries</li>
+      <li><img src="<?php echo $wo['config']['theme_url'];?>/img/check.png"> Stay updated on the latest changes</li>
+</ul>
+      </div>
+      </div>
+      <div class="col-md-5">
+	  <div class="login fadeInUp animated animated_5" style="overflow:visible;">
+	  <form id="register" class="fadeInUp animated animated_9" method="post">
+				<p class="title"><?php echo $wo['lang']['sign_up']?></p>
+				<div class="errors"></div>
+				<input name="username" type="text" placeholder="<?php echo $wo['lang']['username'];?>*" autofocus/>
+				<input name="first_name" type="text" placeholder="<?php echo $wo['lang']['first_name'];?>*" autofocus/>
+				<input name="last_name" type="text" placeholder="<?php echo $wo['lang']['last_name'];?>*" autofocus/>
+				<input name="email" style="display:inline;" type="text" placeholder="NHS email*" />
+                <input name="confirm_email" style="display:inline;" type="text" placeholder="Confirm NHS email*" />
+				<?php if($wo['config']['sms_or_email'] == 'sms') {?>
+					<input name="phone_num" type="text" placeholder="<?php echo $wo['lang']['phone_num_ex'];?>" />
+				<?php } ?>
+				<input name="password" type="password" placeholder="<?php echo $wo['lang']['password'];?>*" />
+				
+				<!--<input name="confirm_password" type="password" placeholder="<?php echo $wo['lang']['confirm_password'];?>" />-->
+				<?php 
+					if (!empty($fields) && count($fields) > 0) {
+						foreach ($fields as $key => $wo['field']) {
+							echo Wo_LoadPage('welcome/fields');
+						}
+					}
+				?>
+					
+                
+                <select name="custom_utype" id="custom_utype" required>
+                <option value="0">Choose Role</option>
+					<?php
+						foreach(WoUserTYpe() as $key => $value){
+					?>
+					<option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+					<?php
+					
+						}
+					?>
+				</select>			
+				
+				
+				<select name="gender" id="gender">
+					<option value="0"><?php echo $wo['lang']['gender']?></option>
+					<?php foreach ($wo['genders'] as $key => $gender) { ?>
+						<option value="<?php echo($key) ?>"><?php echo $gender; ?></option>
+					<?php } ?>
+				</select>
+				<?php if($wo['config']['reCaptcha'] == 1) {?>
+					<div class="form-group" style="margin-top:10px;">
+						<div class="g-recaptcha" data-sitekey="<?php echo $wo['config']['reCaptchaKey']?>"></div>
+					</div>
+				<?php } ?>
+				<?php if(!empty( $_GET['last_url'])){?>
+					<div class="form-group">
+						<input type="hidden" name="last_url" value="<?php echo urldecode(Wo_Secure($_GET['last_url']));?>">
+					</div>
+				<?php } ?>
+				<div class="terms">
+					<input type="checkbox" name="accept_terms" id="accept_terms" onchange="activateButton(this)">
+					<label for="accept_terms"> 
+						<?php echo $wo['lang']['terms_agreement'] ?> <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=terms');?>"><?php echo $wo['lang']['terms_of_use'] ?></a> & <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=privacy-policy');?>"><?php echo $wo['lang']['privacy_policy'] ?></a>
+					</label>
+					<div class="clear"></div>
+				</div>
+				<div class="login_signup_combo">
+					<div class="signup__">
+						<a class="dec" href="<?php echo $wo['config']['site_url'];?>"><?php echo $wo['lang']['login']?></a>
+					</div>
+					<div class="login__">
+						<svg class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="spinner__path" fill="none" stroke-width="7" stroke-linecap="round" cx="33" cy="33" r="29"></circle></svg>
+						<button type="submit" class="btn btn-main btn-green" id="sign_submit" disabled><?php echo $wo['lang']['lets_go']?></button>
+					</div>
+				</div>
+				<?php if (isset($_GET['invite'])): ?>
+					<input type="text" class="hidden" value="<?php echo $_GET['invite']; ?>" name="invited">
+				<?php endif; ?>
+			</form>
+	</div>	  
+	</div>
+    <div class="col-md-1"></div>
+      </div></div>
+
+
+
+	
+</div>
+<div class="container"><?php echo Wo_LoadPage('footer/welcome');?></div>
+
+<script>
+var working = false;
+var $this = $('#register');
+var $state = $this.find('.errors');
+$(function() {
+  $this.ajaxForm({
+    url: Wo_Ajax_Requests_File() + '?f=register',
+    beforeSend: function() {
+		working = true;
+		$this.find('button').attr("disabled", true);
+		$this.find('.spinner').addClass("show");
+    },
+    success: function(data) {
+      if (data.status == 200) {
+		$state.addClass('success');
+        $state.html('<?php echo $wo['lang']['welcome_'] ?>');
+		$this.find('.spinner').removeClass("show");
+        setTimeout(function () {
+         window.location.href = data.location;
+        }, 1000);
+      } else if (data.status == 300) {
+        window.location.href = data.location;
+      } else {
+        $this.find('button').attr("disabled", false);
+		$this.find('.spinner').removeClass("show");
+        $state.html(data.errors);
+      } 
+      working = false;
+    }
+  });
+});
+
+function activateButton(element) {
+	if(element.checked) {
+		document.getElementById("sign_submit").disabled = false;
+	}
+	else  {
+		document.getElementById("sign_submit").disabled = true;
+	}
+};
+</script>

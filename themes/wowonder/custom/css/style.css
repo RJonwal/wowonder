@@ -1,0 +1,22 @@
+/* 
+
+Add here your custom css styles Example: p { text-align: center; color: red; } 
+
+*/
+#sign_submit {
+    background: green !important;
+    border: none !important;
+}
+.wo_search_page .nearby_user_wrapper {
+    min-height: 245px !important;
+    max-height: 245px !important;
+}
+.title.user_wrapper_link {
+    line-height: 21px;
+}
+.setting-privacy-form label {
+    text-transform: unset;
+}
+.btn.btn-main.btn-active.posts-count {
+  display: none !important;
+}

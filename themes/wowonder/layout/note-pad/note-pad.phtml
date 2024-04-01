@@ -1,0 +1,90 @@
+<div class="page-margin">
+	<div class="row">
+		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
+		<div class="col-md-7 middlecol wo-create-forms">
+			<h3 class="wo_create_form_cover group">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid">
+					<rect x="3" y="3" width="7" height="7"></rect>
+					<rect x="14" y="3" width="7" height="7"></rect>
+					<rect x="14" y="14" width="7" height="7"></rect>
+					<rect x="3" y="14" width="7" height="7"></rect>
+				</svg>
+				Create New Note
+				<span class="<?php echo Wo_RightToLeft('pull-right'); ?>">
+					<a data-ajax="?link1=notepad" href="<?php echo Wo_SeoLink('index.php?link1=notepad'); ?>">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left">
+							<polyline points="15 18 9 12 15 6"></polyline>
+						</svg>MY NotePad
+					</a>
+				</span>
+				<div class="clear"></div>
+			</h3>
+			<div class="wo_settings_page">
+				<form class="node-pad-form form-horizontal" method="post">
+					<div class="setting-panel row">
+						<!-- Text input-->
+						<div class="form-group col-lg-12">
+							<label class="col-md-12" for="title">Title</label>
+							<div class="col-md-12">
+								<input name="title" id="title" type="text" class="form-control input-md" placeholder="Title..">
+							</div>
+						</div>
+
+						<div class="form-group col-lg-12">
+							<label class="col-md-12" for="note">Note*</label>
+							<div class="col-md-12">
+								<textarea name="note" id="note" rows="10" class="form-control input-md" placeholder="Note.." required></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="app-general-alert setting-update-alert"></div>
+					<div class="form-group last-sett-btn modal-footer">
+						<div class="ball-pulse">
+							<div></div>
+							<div></div>
+							<div></div>
+						</div>
+						<button type="submit" id="save_note" class="btn btn-main setting-panel-mdbtn">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+								<line x1="12" y1="5" x2="12" y2="19"></line>
+								<line x1="5" y1="12" x2="19" y2="12"></line>
+							</svg>
+							<?php echo $wo['lang']['create']; ?>
+						</button>
+					</div>
+					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession(); ?>">
+				</form>
+			</div>
+		</div>
+		<!-- .col-md-8 -->
+		<?php echo Wo_LoadPage('sidebar/content'); ?>
+	</div>
+	<!-- .row -->
+</div>
+<!-- .page-margin -->
+<script type="text/javascript">
+	$(function() {
+	  	var textVal =$('#note').val();
+	    $('#note').val(textVal.replace(/<br *\/?>/gi,'\n'));
+	    
+		$('form.node-pad-form').ajaxForm({
+			url: Wo_Ajax_Requests_File() + '?f=note_pad',
+			beforeSend: function() {
+				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+			},
+			success: function(data) {
+				scrollToTop();
+				//console.log(data);
+				if (data.status == 200) {
+					window.location.href = data.location;
+				} else {
+					//var errors = data.errors.join("<br>");
+					var errors = data.message;
+					$('.app-general-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+					$('.alert-danger').fadeIn(300);
+				}
+				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+			}
+		});
+	});
+</script>

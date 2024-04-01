@@ -1,0 +1,167 @@
+<div class="container-fluid">
+    <div class="block-header">
+        <h2>Pages > Create New Discount Code</h2>
+    </div>
+    <!-- Vertical Layout -->
+    <div class="row">
+        <div class="col-lg-8 col-md-8">
+            <div class="card">
+                <div class="header">
+                    <h2>Create New Discount Code</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success add-settings-alert"></div>
+                    <form class="add-settings" method="POST">
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="code" name="code" class="form-control restrict_space text-uppercase">
+                                <label class="form-label">Discount Code</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label for="type">Type</label>
+                                <select class="form-control show-tick " id="type" name="type">
+                                    <option value="percentage">Percentage</option>
+                                    <option value="amount">Amount</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="price" name="price" class="form-control only_integer">
+                                <label class="form-label">Percentage/Amount</label>
+                            </div>
+                            <span class="error error_price text-danger"></span>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="max_uses_per_user" name="max_uses_per_user" class="form-control only_integer">
+                                <label class="form-label">Max Uses Per User</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="max_uses" name="max_uses" class="form-control only_integer">
+                                <label class="form-label">Max Uses</label>
+                            </div>
+                            <span class="error error_max_uses text-danger"></span>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line valid_from_div">
+                                <input type="text" onkeypress="return false;" id="valid_from" name="valid_from" class="form-control">
+                                <label class="form-label">Valid From</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line valid_to_div">
+                                <input type="text" onkeypress="return false;" id="valid_to" name="valid_to" class="form-control" autocomplete="off">
+                                <label class="form-label">Valid To</label>
+                            </div>
+                            <span class="error error_valid_to text-danger"></span>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!-- #END# Vertical Layout -->
+<script>
+
+$(function() {
+    const currentDate = new Date();
+    const currentDateString = (currentDate.getMonth() + 1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear();
+
+    const validFromDatepicker = new Litepicker({ 
+        element: document.getElementById('valid_from') ,
+        minDate: currentDateString,
+        autoRefresh: true,
+        setup: (picker) => {
+            picker.on('selected', (date) => {
+                const selectedDate = date.format('YYYY-MM-DD');
+                $('.valid_from_div').addClass('focused');
+                validToDatepicker.setOptions({
+                    minDate: selectedDate,
+                });
+            });
+        },
+    });
+
+    const validToDatepicker = new Litepicker({ 
+        element: document.getElementById('valid_to') ,
+        minDate: currentDateString,
+        autoRefresh: true,
+        setup: (picker) => {
+            picker.on('selected', (date) => {
+                $('.valid_to_div').addClass('focused');
+            });
+        },
+    });
+
+    $(document).on("keypress", ".only_integer", function(evt){
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57){
+            evt.preventDefault();
+        }
+    });   
+    $(document).on("keypress", ".restrict_space", function(evt){
+        if (evt.which == 32){
+            evt.preventDefault();
+        }
+    });  
+    var form_add_settings = $('form.add-settings');
+    form_add_settings.submit(function(e) {
+        e.preventDefault(); 
+        $('.error').html('');
+        var maxUses = parseInt($('#max_uses').val());
+        var maxUsesPerUser = parseInt($('#max_uses_per_user').val());
+        var validFromDate = new Date($('#valid_from').val());
+        var validToDate = new Date($('#valid_to').val());
+        var price = parseInt($('#price').val());
+        var stop = false;
+        if (maxUses < maxUsesPerUser) {
+            $('.error_max_uses').html('Max uses should be greater than or equal to max uses per user.');
+            stop = true;
+        }
+
+        if (validFromDate > validToDate) {
+            $('.error_valid_to').html('Valid to date should be greater than valid from date');
+            stop = true;
+        }
+
+        if($("#type").val() == 'percentage' && price > 99){
+            $('.error_price').html('Percentage should be less than 100');
+            stop = true;
+        }
+
+        if(stop){
+            return false;
+        }
+        
+        $.ajax({
+            type: "POST",
+            url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=add_new_discount_code',
+            data: form_add_settings.serialize(),
+            beforeSend: function() {
+                form_add_settings.find('.waves-effect').text('Please wait..');
+            },
+            success: function(data) {
+                if (data.status == 200) {
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+                    $('.add-settings-alert').html('<i class="fa fa-check"></i> Discount Code added successfully');
+                    setTimeout(function () {
+                        window.location.href = '<?php echo Wo_LoadAdminLinkSettings('manage-discount-code'); ?>';
+                    }, 1000);
+                } else if (data.status == 400) {
+                alert(data.message);
+                }
+                form_add_settings.find('.waves-effect').text('Create');
+            }
+        });
+    });
+});
+</script>

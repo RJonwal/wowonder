@@ -1,0 +1,54 @@
+<div class="page-margin">
+  <div class="row">
+    <div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?>
+    </div>
+
+    <div class="col-md-7 middlecol">
+      <div class="row">
+        <label class="col-md-12" for="category"><?php echo $wo['lang']['category']; ?> </label>
+        <div class="col-md-12">
+          <select name="postCategory" id="postCategory" class="form-control">
+            <option value="0">All Categories</option>
+            <?php if ($_SESSION['rpcat'] > 0) {
+              $selected_id = $_SESSION['rpcat'];
+            } else {
+              $selected_id = 0;
+            }
+            ?>
+            <?php foreach ($wo['page_categories'] as $category_id => $category_name) { ?>
+              <option <?php if ($category_id == $selected_id) { ?> selected="selected" <?php } ?> value="<?php echo $category_id ?>"><?php echo $category_name;  ?></option>
+            <?php } ?>
+          </select>
+        </div>
+      </div>
+
+      <div class="trending-posts" style="clear:both;"><br>
+        <?php
+        $stories = Wo_GetTrendingPosts($wo['user']['user_id'], 0, 50);
+        if (count($stories) <= 0) {
+          echo Wo_LoadPage('saved-posts/no-posts');
+        } else {
+          foreach ($stories as $wo['story']) {
+            echo Wo_LoadPage('story/content');
+          }
+        }
+        ?>
+
+      </div>
+    </div>
+
+
+
+
+    <?php echo Wo_LoadPage('sidebar/content'); ?>
+  </div>
+</div>
+<script>
+  $(document).ready(function() {
+    $("#postCategory").change(function() {
+      var catid = $(this).val();
+      //alert(catid);
+      window.location.href = "<?php echo Wo_Link("trending-posts?cat="); ?>" + catid;
+    });
+  });
+</script>

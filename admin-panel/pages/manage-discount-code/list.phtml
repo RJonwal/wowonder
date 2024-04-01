@@ -1,0 +1,14 @@
+<tr class="setting-postlist" id="<?= $wo['discount_code']['id'];?>">
+   <td><?= $wo['discount_code']['id'];?></td>
+   <td><?= $wo['discount_code']['code'];?></td>
+   <td><?= ($wo['discount_code']['type'] == "amount"?"$":'').$wo['discount_code']['price'].($wo['discount_code']['type'] == "percentage"?"%":'');?></td>
+   <td><?= $wo['discount_code']['max_uses_per_user'];?></td>
+   <td><?= $wo['discount_code']['used_coupons'].' / '.$wo['discount_code']['max_uses']?></td>
+   <td><?= date("Y-m-d", strtotime($wo['discount_code']['valid_from']));?></td>
+   <td><?= date("Y-m-d", strtotime($wo['discount_code']['valid_to']));?></td>
+   <td><?= $wo['discount_code']['created_at'];?></td>
+   <td>
+      <a class="btn btn-info waves-effect waves-light" href="<?php echo Wo_LoadAdminLinkSettings('edit-discount-code?id=' . $wo['discount_code']['id']); ?>">EDIT</a>
+      <button class="btn btn-danger waves-effect waves-light" onclick="Wo_DeleteDiscountCode(<?= $wo['discount_code']['id'];?>);">DELETE</button>
+   </td>
+</tr>
