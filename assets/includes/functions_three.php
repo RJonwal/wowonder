@@ -13785,11 +13785,11 @@ function Wo_copyAutoConsultEntries($newUserId)
                 }
             }
 
-            if(isset($sub_sub_cat_id) && $sub_sub_cat_id > 0 ){            
+            if(isset($sub_cat_id) && $sub_cat_id > 0 ){            
                 $query_two = mysqli_query($sqlConnect, "SELECT * from preset_details where cat_id=".$subCategory['id']." AND cby =" . $genericUserId);
                 $preSets = array();
                 while ($preset = mysqli_fetch_assoc($query_two)) {                    
-                    $insertVal = mysqli_query($sqlConnect, "INSERT INTO preset_details (`cat_id`, `presettxt`, `mark_favourite`, `cby`, `cip`, `cstatus`, `cdate`, `dorder`) VALUES ($sub_sub_cat_id, '$preset[presettxt]', $preset[mark_favourite], $newUserId, '$cip', $cstatus ,'$cdate', $preset[dorder])");                    
+                    $insertVal = mysqli_query($sqlConnect, "INSERT INTO preset_details (`cat_id`, `presettxt`, `mark_favourite`, `cby`, `cip`, `cstatus`, `cdate`, `dorder`) VALUES ($sub_cat_id, '$preset[presettxt]', $preset[mark_favourite], $newUserId, '$cip', $cstatus ,'$cdate', $preset[dorder])");                    
                 }
             }
         }
