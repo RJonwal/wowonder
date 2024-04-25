@@ -13831,3 +13831,45 @@ function printr($val,$isDie=1){
     }
     if($isDie){die;}
 }
+
+function cancelUserSubscription($user_id, $type='cancel'){
+    global $sqlConnect, $wo;
+
+    include_once('assets/includes/stripe_config.php');
+
+    $userData_r = mysqli_query($sqlConnect, " SELECT * FROM " . T_USERS . " WHERE `user_id` = {$user_id}");
+    $userData   = mysqli_fetch_assoc($userData_r);
+    try {
+        $stripe_customer_id = $userData['stripe_user_id'];
+        if(empty(trim($stripe_customer_id))){
+            return true;
+        }
+        
+        $active_subscriptions = \Stripe\Subscription::all([
+            'customer' => $stripe_customer_id
+        ]);
+
+        foreach($active_subscriptions as $key => $subscription){
+            if(empty($subscription->canceled_at)){
+                $cancel_sub = $subscription->cancel([
+                    'at_period_end' => false, // Set to false to cancel immediately
+                ]);
+            }
+        }
+
+        if($type == 'delete'){
+            $customer = \Stripe\Customer::retrieve($stripe_customer_id);
+            $customer->delete();
+        }
+
+        $currentDate = date('Y-m-d H:i:s');
+        $q = " UPDATE " . T_PAYMENT_TRANSACTIONS . " SET `subscription_end_date` = '{$currentDate}', `subscription_status` = 0";
+        mysqli_query($sqlConnect, $q);            
+        
+        return true;
+        
+    }
+    catch (Exception $e) {
+        return false;
+    }
+}

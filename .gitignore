@@ -7,3 +7,6 @@ function/mysql_functions.php
 
 function/connectin_config.php
 /function/connectin_config.php
+
+cache/*
+/cache/*

@@ -907,8 +907,11 @@ function Wo_DeleteUser($user_id) {
         }
     }
 
-    
-
+    // Delete User from stripe
+    $subscriptionFlg = cancelUserSubscription($user_id, 'delete');
+    if(!$subscriptionFlg){
+        return false;
+    }
 
     $query_one = mysqli_query($sqlConnect, "DELETE FROM " . T_USERS . " WHERE `user_id` = {$user_id}");
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_RECENT_SEARCHES . " WHERE `user_id` = {$user_id} OR `search_id` = {$user_id}");

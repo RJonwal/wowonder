@@ -11,6 +11,8 @@ if ($f == 'delete_user_account') {
                     'message' => $success_icon . $wo['lang']['account_deleted'],
                     'location' => Wo_SeoLink('index.php?link1=logout')
                 );
+            } else {
+                $errors[] = $error_icon . $wo['lang']['oops_something_went_wrong'];
             }
         }
     }
