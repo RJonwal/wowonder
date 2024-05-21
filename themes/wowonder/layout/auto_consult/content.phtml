@@ -181,14 +181,23 @@
 						}
 					} else {
 						$isCatExist = checkCategoryExists(0, $userid, $_POST['category']);
+
+						$position = getallrow_fn("SELECT dorder FROM  category_details WHERE   cby='$userid' order by dorder desc limit 0, 1");
+						if(mysqli_num_rows($position) > 0){
+							while($postitionData = mysqli_fetch_assoc($position)){
+								$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+							}
+						} else {
+							$order = 0;
+						}
+
 						if ($isCatExist) {
 							$data['cstatus'] = 1;
 							$data['cby'] = $userid;
 							$data['cip'] = ipAddress();
 							$data['cdate'] = date("Y-m-d H:i:s");
-							$data['bgcolor'] = $_POST['cbgcolor'];
-							$default_dorder = getallrow_fn("SELECT id FROM  category_details WHERE  cby='$userid'");
-							$data['dorder'] = mysqli_num_rows($default_dorder);
+							$data['bgcolor'] = $_POST['cbgcolor'];							
+							$data['dorder'] = $order;
 							$insert_value = dbRowInsert("category_details", test_input($data));
 							if (!empty($insert_value)) {
 								$msg = "Category added Successfully";
@@ -257,8 +266,12 @@
 						$isCatExist = checkCategoryExists(0, $userid, $_POST['subcategory']);
 
 						$position = getallrow_fn("SELECT dorder FROM  category_details WHERE   cby='$userid' and parent_id='" . $_POST['cat_id'] . "' order by dorder desc limit 0, 1");
-						while($postitionData = mysqli_fetch_assoc($position)){
-							$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+						if(mysqli_num_rows($position) > 0){
+							while($postitionData = mysqli_fetch_assoc($position)){
+								$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+							}
+						} else {
+							$order = 0;
 						}
 						if ($isCatExist) {
 							$data['cstatus'] = 1;
@@ -323,8 +336,12 @@
 								}
 							}
 							$position = getallrow_fn("SELECT dorder FROM  preset_details WHERE  cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "' order by dorder desc limit 0, 1");
-							while($postitionData = mysqli_fetch_assoc($position)){
-								$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+							if(mysqli_num_rows($position) > 0){
+								while($postitionData = mysqli_fetch_assoc($position)){
+									$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+								}
+							} else {
+								$order = 0;
 							}
 
 							if ($shortCodeVerified) {
@@ -332,7 +349,6 @@
 								$data['cby'] = $userid;
 								$data['cip'] = ipAddress();
 								$data['cdate'] = date("Y-m-d H:i:s");
-								$default_dorder = getallrow_fn("SELECT id FROM  preset_details WHERE  cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "'");
 								$data['dorder'] = $order;
 								$insert_value = dbRowInsert("preset_details", test_input($data));
 								if (!empty($insert_value)) {
