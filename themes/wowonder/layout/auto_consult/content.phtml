@@ -118,13 +118,57 @@
 				$mark_as_fav = 'Mark as favourite';
 				$userid = $wo['user']['user_id'];
 
+				function checkCategoryExists($id, $userid, $categoryName){
+					$isCatExist = true;
+
+					if($id > 0){
+						$mainCategoryExist = "SELECT * FROM  category_details WHERE category_name='" . $categoryName . "' and parent_id=0 and id!='$id' and cby='" . $userid . "' ";
+					} else {
+						$mainCategoryExist = "SELECT * FROM  category_details WHERE category_name='" . $categoryName . "' and parent_id=0 and cby='" . $userid . "' ";
+					}
+					$mainCategoryExist = getallrow_fn($mainCategoryExist);
+					if(mysqli_num_rows($mainCategoryExist) > 0){
+						$isCatExist = false;
+					}
+					if($isCatExist){
+						if($id > 0){
+							$subCategoryExist = "SELECT id,parent_id FROM  category_details WHERE category_name='" . $categoryName . "' and parent_id!=0 and id!='$id' and cby='" . $userid . "' ";
+						} else {
+							$subCategoryExist = "SELECT id,parent_id FROM  category_details WHERE category_name='" . $categoryName . "' and parent_id!=0 and cby='" . $userid . "' ";
+						}
+						$subCategoryExist = getallrow_fn($subCategoryExist);
+						if(mysqli_num_rows($subCategoryExist) > 0){
+							while($subCategoryExistData = mysqli_fetch_assoc($subCategoryExist)){
+								$subPidExist = "SELECT parent_id FROM  category_details WHERE id=".$subCategoryExistData['parent_id'];
+								$subPidExist = getallrow_fn($subPidExist);
+								if(mysqli_num_rows($subPidExist) > 0){
+									while($subPidExistData = mysqli_fetch_assoc($subPidExist)){
+										if($subPidExistData['parent_id'] == 0){
+											$isCatExist = false;
+											break;
+										} else {
+											$subPpidExist = "SELECT id FROM  category_details WHERE id=".$subPidExistData['parent_id'];
+											$subPpidExist = getallrow_fn($subPpidExist);
+											if(mysqli_num_rows($subPpidExist) > 0){
+												$isCatExist = false;
+												break;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					return $isCatExist;
+				}
+
 				if (isset($_REQUEST['badd'])) {
 					$data['category_name'] = $_POST['category'];
 					if (isset($_POST['tid']) && $_POST['tid'] != "") {
 						$id = $_POST['tid'];
-						$chk = "SELECT * FROM  category_details WHERE category_name='" . $_POST['category'] . "' and id!='$id' and cby='" . $userid . "' ";
-						$chk = getallrow_fn($chk);
-						if (empty(mysqli_num_rows($chk))) {
+
+						$isCatExist = checkCategoryExists($id, $userid, $_POST['category']);
+						if ($isCatExist) {
 							$data['bgcolor'] = $_POST['cbgcolor'];
 							$updte =	dbRowUpdate("category_details", $data, "where id=" . $id . " and cby=" . $userid);
 							if (!empty($updte)) {
@@ -136,8 +180,8 @@
 							$msg = "Category name already exit.";
 						}
 					} else {
-						$chk = getallrow_fn("SELECT * FROM  category_details WHERE category_name='" . $_POST['category'] . "' and cby='" . $userid . "' ");
-						if (!mysqli_num_rows($chk)) {
+						$isCatExist = checkCategoryExists(0, $userid, $_POST['category']);
+						if ($isCatExist) {
 							$data['cstatus'] = 1;
 							$data['cby'] = $userid;
 							$data['cip'] = ipAddress();
@@ -196,8 +240,8 @@
 					$data['category_name'] = $_POST['subcategory'];
 					if (isset($_POST['tid']) && $_POST['tid'] != "") {
 						$id = $_POST['tid'];
-						$chk = getallrow_fn("SELECT * FROM  category_details WHERE category_name='" . $_POST['subcategory'] . "' and id!='$id' and cby='" . $userid . "'");
-						if (empty(mysqli_num_rows($chk))) {
+						$isCatExist = checkCategoryExists($id, $userid, $_POST['subcategory']);
+						if ($isCatExist) {
 							$data['bgcolor'] = $_POST['cbgcolor'];
 							$updte =	dbRowUpdate("category_details", $data, "where id=" . $id . " and cby=" . $userid);
 							if (!empty($updte)) {
@@ -210,14 +254,18 @@
 					} else {
 						$data['parent_id'] = $_POST['cat_id'];
 						$data['bgcolor'] = $_POST['cbgcolor'];
-						$chk = getallrow_fn("SELECT * FROM  category_details WHERE category_name='" . $_POST['subcategory'] . "' and cby='" . $userid . "'");
-						if (empty(mysqli_num_rows($chk))) {
+						$isCatExist = checkCategoryExists(0, $userid, $_POST['subcategory']);
+
+						$position = getallrow_fn("SELECT dorder FROM  category_details WHERE   cby='$userid' and parent_id='" . $_POST['cat_id'] . "' order by dorder desc limit 0, 1");
+						while($postitionData = mysqli_fetch_assoc($position)){
+							$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+						}
+						if ($isCatExist) {
 							$data['cstatus'] = 1;
 							$data['cby'] = $userid;
 							$data['cip'] = ipAddress();
-							$data['cdate'] = date("Y-m-d H:i:s");
-							$default_dorder = getallrow_fn("SELECT id FROM  category_details WHERE   cby='$userid' and parent_id='" . $_POST['cat_id'] . "'");
-							$data['dorder'] = mysqli_num_rows($default_dorder);
+							$data['cdate'] = date("Y-m-d H:i:s");							
+							$data['dorder'] = $order;
 							$insert_value = dbRowInsert("category_details", test_input($data));
 							if (!empty($insert_value)) {
 								$msg = "Sub category added Successfully";
@@ -274,15 +322,18 @@
 									$shortCodeVerified = false;
 								}
 							}
+							$position = getallrow_fn("SELECT dorder FROM  preset_details WHERE  cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "' order by dorder desc limit 0, 1");
+							while($postitionData = mysqli_fetch_assoc($position)){
+								$order = !empty($postitionData['dorder']) ? $postitionData['dorder']+1 : 1;
+							}
 
 							if ($shortCodeVerified) {
 								$data['cstatus'] = 1;
 								$data['cby'] = $userid;
 								$data['cip'] = ipAddress();
 								$data['cdate'] = date("Y-m-d H:i:s");
-								$data['short_code'] = empty($shortcode) ? null : $shortcode;
 								$default_dorder = getallrow_fn("SELECT id FROM  preset_details WHERE  cat_id='" . $_POST['cat_id'] . "' and cby='" . $userid . "'");
-								$data['dorder'] = mysqli_num_rows($default_dorder);
+								$data['dorder'] = $order;
 								$insert_value = dbRowInsert("preset_details", test_input($data));
 								if (!empty($insert_value)) {
 									$msg = "Preset added Successfully";
@@ -350,7 +401,7 @@
 					<div class="row">
 						<div class="col-md-7" id="sortable">
 							<?php
-							$getcategory = getallrow_fn("select * from category_details where parent_id='0' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+							$getcategory = getallrow_fn("select * from category_details where parent_id='0' and cby='" . $userid . "'  ORDER BY dorder ASC");
 							if (mysqli_num_rows($getcategory)) {
 							?>
 								<ul class="myUL" id="myUL">
@@ -387,7 +438,7 @@
 											<?php } ?>
 											<ul class='nested'>
 												<?php
-												$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 												
 												if (mysqli_num_rows($getpreset)) {
 													while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
@@ -412,7 +463,7 @@
 												}
 												?>
 												<?php
-												$getsubcat = getallrow_fn("select * from category_details where parent_id='$id' and parent_id!='0' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												$getsubcat = getallrow_fn("select * from category_details where parent_id='$id' and parent_id!='0' and cby='" . $userid . "'  ORDER BY dorder ASC");
 												if (mysqli_num_rows($getsubcat)) {
 													while ($row_getsubcat = mysqli_fetch_assoc($getsubcat)) {
 														$id = $row_getsubcat['id'];
@@ -426,7 +477,7 @@
 															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onclick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
 															echo "<ul class='nested'  id='" . $id . "'>";
-															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 															if (mysqli_num_rows($getpreset)) {
 																while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
 																	$pid = $row_getpreset['id'];
@@ -450,7 +501,7 @@
 																echo '<li class="add-preset-li"><i class="fa fa-plus-circle" style="color:green">&nbsp;&nbsp;<span>Add Preset Here.</span> </i></>';
 															}
 															//3rd Level Category
-															$getsubcat3 = getallrow_fn("select * from category_details where parent_id='$id' and cby='" . $userid . "' and parent_id!='0' order by category_name desc");
+															$getsubcat3 = getallrow_fn("select * from category_details where parent_id='$id' and cby='" . $userid . "' and parent_id!='0' ORDER BY dorder ASC");
 															if (mysqli_num_rows($getsubcat3)) {
 																while ($row_getsubcat3 = mysqli_fetch_assoc($getsubcat3)) {
 																	$id = $row_getsubcat3['id'];
@@ -458,11 +509,11 @@
 																	$pid = $row_getsubcat3['parent_id'];
 																	$mrk = $row_getsubcat3['mark_favourite'];
 													?>
-														<li class="3">
+														<li class="cat<?php echo $id; ?>" id="<?php echo $id; ?>">
 															<span class="box"><?php echo $scat; ?></span>
 															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
-																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 																	if (mysqli_num_rows($getpreset3)) {
 															?>
 																<ul class='nested' id="<?php echo $id; ?>">
@@ -625,7 +676,7 @@
 										<div class="col-md-10">
 											<ul class=''>
 												<?php
-												$getpreset = getallrow_fn("select * from preset_details where mark_favourite='1' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												$getpreset = getallrow_fn("select * from preset_details where mark_favourite='1' and cby='" . $userid . "'  ORDER BY dorder ASC");
 												if (mysqli_num_rows($getpreset)) {
 													while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
 														$pid = $row_getpreset['id'];
@@ -647,7 +698,7 @@
 												}
 												?>
 												<?php
-												$getsubcat = getallrow_fn("select * from category_details where parent_id='$id' and parent_id!='0' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+												$getsubcat = getallrow_fn("select * from category_details where parent_id='$id' and parent_id!='0' and cby='" . $userid . "'  ORDER BY dorder ASC");
 												if (mysqli_num_rows($getsubcat)) {
 													//echo "<ul class='nested'>";
 													while ($row_getsubcat = mysqli_fetch_assoc($getsubcat)) {
@@ -660,7 +711,7 @@
 															<div class="pull-right"><i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i></div>
 															<?php
 															echo "<ul class='nested'>";
-															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 															if (mysqli_num_rows($getpreset)) {
 																while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
 																	$pid = $row_getpreset['id'];
@@ -687,7 +738,7 @@
 															<span class="box"><?php echo $scat; ?></span>
 															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-square" title="Add Sub category" onClick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
-																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC,cdate DESC");
+																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 																	if (mysqli_num_rows($getpreset3)) {
 															?>
 																<ul class='nested'>
@@ -752,7 +803,7 @@
 									</div>
 									<center>
 										<button type="submit" class="btn btn-danger" name="bdelete">Yes</button>
-										<button type="submit" class="btn btn-warning" name="badd" data-dismiss="modal">No</button>
+										<button type="submit" class="btn btn-warning" data-dismiss="modal">No</button>
 									</center>
 								</form>
 							</div>
@@ -776,7 +827,8 @@
 								var dorder = ui.item.index();
 								var id = ui.item.attr("id");
 								var data_type = ui.item.attr("data-type");
-								var ul_id = ui.item.closest('li').attr("id");
+								// var ul_id = ui.item.closest('li').attr("id");
+								var ul_id = ui.item.parent().closest('li').attr("id");
 								var ul_id_ul = ui.item.closest('ul').attr("id");
 								
 								if (ul_id_ul === 'myUL' && data_type == 'preset') {
@@ -794,11 +846,12 @@
 										var ul_id = (ui.item.parent().closest('li').attr("id"));
 									}
 								}
-								var selectid = ul_id;
-								if (id == ul_id) {
+								
+								if (typeof ul_id === 'undefined') {
 									var selectid = "sortable";
+								} else {
+									var selectid = ul_id;
 								}
-								console.log(selectid);
 								//Reetting all order
 								$('#' + selectid + '>ul>li').each(function(i, li) {
 									var $product = $(li);
@@ -809,6 +862,7 @@
 									}
 									var dorder = $product.index();
 									var data_type = $product.attr("data-type");
+									console.log(dorder, id);
 									$.post("function/function.php", {
 											action: "update_dorder",
 											catid: id,
@@ -821,10 +875,8 @@
 											//alert("Data: " + data + "\nStatus: " + status);
 										});
 								});
-								console.log('update: ' + ui.item.index());
 							},
 							start: function(event, ui) {
-								console.log('start: ' + ui.item.index())
 							}
 						});
 						$("#sortable ul").disableSelection();
