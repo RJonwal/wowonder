@@ -10,14 +10,14 @@
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg> -->
-             <a class="btn btn-main" href="<?php echo Wo_SeoLink('index.php?link1=edit-note-pad&npid=' . $wo['notepad']['id']); ?>">
+             <a class="btn-notpad-title" href="<?php echo Wo_SeoLink('index.php?link1=edit-note-pad&npid=' . $wo['notepad']['id']); ?>">
                  <strong><?php echo $wo['notepad']['title']; ?></strong>
                  </a>
           </div>
           <!--<div class="col-xs-12 col-md-10 no-padding-left"> NOTE: <?php // echo substr(nl2br(stripslashes($wo['notepad']['note'])), 0, 150); ?> </div>-->
           <div class="col-xs-12 col-md-2 no-padding-left">
             <div class="book-action-btn">
-              <a onclick="return  delete_note(<?php echo $wo['notepad']['id']; ?>)" class="btn btn-info btn-sm " title=" <?php echo $wo['lang']['delete']; ?>"  title="delete">
+              <a onclick="return  delete_note(<?php echo $wo['notepad']['id']; ?>)" class="btn btn-danger btn-sm " title=" <?php echo $wo['lang']['delete']; ?>"  title="delete">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

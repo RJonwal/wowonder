@@ -22,7 +22,7 @@
 
 						<td><span><?= !empty($transaction['subscription_end_date']) ? date('Y-m-d', strtotime($transaction['subscription_end_date'])) : ''; ?></span></td>
 
-						<td><span><?= ($transaction['kind'] == 'FREE' ? 'Fre Trial' : Wo_GetCurrency($wo['config']['ads_currency']).$transaction['amount']); ?></span></td>
+						<td><span><?= ($transaction['kind'] == 'FREE' ? 'Free Trial' : Wo_GetCurrency($wo['config']['ads_currency']).$transaction['amount']); ?></span></td>
 						
 						<td><span><?= $transaction['subscription_status'] == 1 && $access_autoconsult ? 'Active' : 'Expired'; ?></span></td>
 
@@ -39,7 +39,7 @@
 		    <?php endforeach; ?>
 		<?php else: ?>
 			<tr>
-				<td colspan="4" class="text-center" style="height: 200px;">
+				<td colspan="6" class="text-center" style="height: 200px;">
 					No subscription found
 				</td>
 			</tr>

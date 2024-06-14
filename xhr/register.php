@@ -73,9 +73,9 @@ if ($f == 'register') {
         if (strlen($_POST['password']) < 6) {
             $errors = $error_icon . $wo['lang']['password_short'];
         }
-        if ($_POST['email'] != $_POST['confirm_email']) {
-            $errors = $error_icon . "Email mismatch.";
-        }
+        // if ($_POST['email'] != $_POST['confirm_email']) {
+        //     $errors = $error_icon . "Email mismatch.";
+        // }
         if ($config['reCaptcha'] == 1) {
             if (!isset($_POST['g-recaptcha-response']) || empty($_POST['g-recaptcha-response'])) {
                 $errors = $error_icon . $wo['lang']['reCaptcha_error'];

@@ -120,6 +120,7 @@ define('T_FUNDING', 'Wo_Funding');
 define('T_FUNDING_RAISE', 'Wo_Funding_Raise');
 define('T_USER_ADDRESS_BOOK','wo_address_book');
 define('T_USER_NOTE_PAD','wo_note_pad');
+define('T_CONTACT_DETAIL','contact_details');
 
 
 ///--- CONSTANTS
@@ -127,5 +128,6 @@ define('GENERIC_USERNAME','Simon');
 
 define('MENU_NOTEPAD','My Notepad');
 
+define('CONTACT_EMAIL','gpfrontier1@gmail.com');
 
 ?>

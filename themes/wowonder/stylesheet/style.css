@@ -5624,7 +5624,12 @@ ul#filterby-post {
 }
 
 .pricing_table {
-    margin: 30px 0 0
+    margin: 30px 0 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 2px 1px -1px rgba(0, 0, 0, .12);
+    padding: 20px;
+    background: white;
+    margin-bottom: 20px;
+    border-radius: 5px;
 }
 
 .pricing_table .row {
@@ -5637,7 +5642,7 @@ ul#filterby-post {
 .pricing_table .col-md-3,
 .pricing_table .col-sm-6,
 .pricing_table .col-xs-12 {
-    padding: 0
+    padding: 10px;
 }
 
 .pricing {
@@ -5646,7 +5651,8 @@ ul#filterby-post {
     padding-left: 0;
     margin-bottom: 30px;
     background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .16)
+    /* box-shadow: 0 1px 2px rgba(0, 0, 0, .16) */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 2px 1px -1px rgba(0, 0, 0, .12);;
 }
 
 .pricing img {
@@ -5662,8 +5668,8 @@ ul#filterby-post {
 
 .pricing .price-table-head {
     padding: 10px 13px;
-    background-color: #f6f7fa;
-    border-radius: 0 0 90px 90px
+    /* background-color: #f6f7fa; */
+    /* border-radius: 0 0 90px 90px */
 }
 
 .pricing .plan-name big {
@@ -20803,6 +20809,39 @@ a.r-pay-btn {
     border-radius: 2px;
     transform: rotate(45deg);
 }
+.alert-dismissible{
+    background-color: #f8c81c;
+    border-left: none;
+    color: #000;
+    padding: 20px 50px;
+    padding-right: 70px;
+    position: relative;
+}
+.alert-dismissible>div{
+    display: flex;
+    align-items: center;
+}
+.alert-dismissible>div>span{
+    font-size: 18px;
+    text-transform: uppercase;
+    padding-right: 30px;
+}
+.alert-dismissible>div>p{
+    margin: 0;
+}
+.alert-dismissible>div>.close{
+    font-size: 30px;
+    color: #363636;
+    opacity: 1;
+    text-shadow: none;
+    position: absolute;
+    right: 40px;
+    top: 14px;
+}
+
+
+
+
 @media (max-width:991px){
     .payment-form{
         margin-top: 2rem;
@@ -20836,6 +20875,21 @@ a.r-pay-btn {
     .discount-box {
         flex-direction: column;
     }
-
+    .alert-dismissible{
+        padding: 20px 20px;
+        padding-right: 40px;
+    }
+    .alert-dismissible>div{
+        flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
+    }
+    .alert-dismissible>div>.close{
+        right: 18px;
+    }
     
+}
+
+a.btn-notpad-title {
+    color: #061f6f;
+    text-decoration: none;
 }

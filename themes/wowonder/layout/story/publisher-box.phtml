@@ -319,7 +319,7 @@ if (!empty($_GET['url'])) {
         <?php endif ?>
 
         <!--Record Audio-->
-        <?php if ($wo['config']['audio_upload'] == 1) { ?>
+        <!-- <?php if ($wo['config']['audio_upload'] == 1) { ?>
           <div class="<?php echo Wo_RightToLeft('pull-left'); ?>" id="recordPostAudioWrapper">
             <div class="poster-left-buttons">
               <div class="input-group">
@@ -332,7 +332,7 @@ if (!empty($_GET['url'])) {
               </div>
             </div>
           </div>
-        <?php } ?>
+        <?php } ?> -->
 
         <!--Add Feeling-->
         <!--<div class="<?php echo Wo_RightToLeft('pull-left'); ?> emo-form" >
@@ -346,7 +346,7 @@ if (!empty($_GET['url'])) {
 			</div>-->
 
         <!--Uploaded File-->
-        <?php if ($wo['config']['fileSharing'] == 1) { ?>
+        <!-- <?php if ($wo['config']['fileSharing'] == 1) { ?>
           <div class="<?php echo Wo_RightToLeft('pull-left'); ?>">
             <div class="poster-left-buttons">
               <div class="input-group">
@@ -360,7 +360,7 @@ if (!empty($_GET['url'])) {
               </div>
             </div>
           </div>
-        <?php } ?>
+        <?php } ?> -->
 
         <!--Create Product-->
         <?php if (($wo['page'] == 'home' || $wo['page'] == 'timeline') && $wo['config']['classified'] == 1) { ?>
@@ -404,7 +404,7 @@ if (!empty($_GET['url'])) {
 			</div>-->
 
         <!--Uploaded Music-->
-        <?php if ($wo['config']['audio_upload'] == 1) { ?>
+        <!-- <?php if ($wo['config']['audio_upload'] == 1) { ?>
           <div class="<?php echo Wo_RightToLeft('pull-left'); ?>">
             <div class="poster-left-buttons">
               <div class="input-group">
@@ -417,7 +417,7 @@ if (!empty($_GET['url'])) {
               </div>
             </div>
           </div>
-        <?php } ?>
+        <?php } ?> -->
 
         <!--Add Bg Color-->
         <?php if ($wo['config']['colored_posts_system'] == 1 && !empty($wo['post_colors'])) { ?>

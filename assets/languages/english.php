@@ -74,7 +74,7 @@ $wo['lang'] = array(
     'wondered_post' => 'wondered your {postType} {post}',
     'share_post' => 'shared your {postType} {post}',
     'commented_on_post' => 'commented on your {postType} {post}',
-    'activity_liked_post' => 'liked {user} <a class="main-color" href="{post}">post</a>.',
+    'activity_liked_post' => 'liked {user}\'s <a class="main-color" href="{post}">post</a>.',
     'activity_wondered_post' => 'wondered {user} <a class="main-color" href="{post}">post</a>.',
     'activity_share_post' => 'shared {user} <a class="main-color" href="{post}">post</a>.',
     'activity_commented_on_post' => 'commented on {user} <a class="main-color" href="{post}">post</a>.',
@@ -150,6 +150,7 @@ $wo['lang'] = array(
     'max_upload_size' => 'Max upload size for videos, images, sounds, and files',
     'max_characters_length' => 'Max characters length',
     'allowed_extenstions' => 'Allowed extenstions',
+    'contact_form' => 'Contact Form',
     // reCaptcha settting
     'reCaptcha_setting' => 'reCaptcha Setting',
     'reCaptcha_key_is_required' => 'reCaptcha key is required',

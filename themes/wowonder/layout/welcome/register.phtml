@@ -53,21 +53,13 @@ body:before{content:none;}
 				<input name="first_name" type="text" placeholder="<?php echo $wo['lang']['first_name'];?>*" autofocus/>
 				<input name="last_name" type="text" placeholder="<?php echo $wo['lang']['last_name'];?>*" autofocus/>
 				<input name="email" style="display:inline;" type="text" placeholder="NHS email*" />
-                <input name="confirm_email" style="display:inline;" type="text" placeholder="Confirm NHS email*" />
+                <!-- <input name="confirm_email" style="display:inline;" type="text" placeholder="Confirm NHS email*" /> -->
 				<?php if($wo['config']['sms_or_email'] == 'sms') {?>
 					<input name="phone_num" type="text" placeholder="<?php echo $wo['lang']['phone_num_ex'];?>" />
 				<?php } ?>
 				<input name="password" type="password" placeholder="<?php echo $wo['lang']['password'];?>*" />
 				
 				<!--<input name="confirm_password" type="password" placeholder="<?php echo $wo['lang']['confirm_password'];?>" />-->
-				<?php 
-					if (!empty($fields) && count($fields) > 0) {
-						foreach ($fields as $key => $wo['field']) {
-							echo Wo_LoadPage('welcome/fields');
-						}
-					}
-				?>
-					
                 
                 <select name="custom_utype" id="custom_utype" required>
                 <option value="0">Choose Role</option>
@@ -79,7 +71,15 @@ body:before{content:none;}
 					
 						}
 					?>
-				</select>			
+				</select>	
+
+				<?php 
+					if (!empty($fields) && count($fields) > 0) {
+						foreach ($fields as $key => $wo['field']) {
+							echo Wo_LoadPage('welcome/fields');
+						}
+					}
+				?>		
 				
 				
 				<select name="gender" id="gender">
@@ -101,7 +101,8 @@ body:before{content:none;}
 				<div class="terms">
 					<input type="checkbox" name="accept_terms" id="accept_terms" onchange="activateButton(this)">
 					<label for="accept_terms"> 
-						<?php echo $wo['lang']['terms_agreement'] ?> <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=terms');?>"><?php echo $wo['lang']['terms_of_use'] ?></a> & <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=privacy-policy');?>"><?php echo $wo['lang']['privacy_policy'] ?></a>
+						<!-- <?php echo $wo['lang']['terms_agreement'] ?> <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=terms');?>"><?php echo $wo['lang']['terms_of_use'] ?></a> & <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=privacy-policy');?>"><?php echo $wo['lang']['privacy_policy'] ?></a> -->
+						<span style="color:red;">Ensure all boxes filled and the check box ticked</span>
 					</label>
 					<div class="clear"></div>
 				</div>

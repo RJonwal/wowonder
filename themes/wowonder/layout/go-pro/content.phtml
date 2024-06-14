@@ -24,11 +24,11 @@
 		font-weight: 600;
 	}
 
-	.block-free-trial button #startTrialBtn {}
+	.block-free-trial button .startTrialBtn {}
 
-	button#startTrialBtn {}
+	button.startTrialBtn {}
 
-	button#startTrialBtn {
+	button.startTrialBtn {
 		background: #061f6f;
 		color: #fff;
 		padding: 9px 30px;
@@ -57,12 +57,121 @@
 </div>
 
 <div class="page-margin wo_about_page_margin">
+	<div class="pricing_table">		
+		<!-- free trial button -->
+		<section>
+			<?php global $sqlConnect;
+			$user = Wo_UserData($wo['user']['user_id']);
+
+			$user_id = $wo['user']['user_id'];
+
+			// subscription
+			$query1 = "SELECT * FROM ".T_PAYMENT_TRANSACTIONS." WHERE userid = $user_id";
+			$sql_query1 = mysqli_query($sqlConnect, $query1);
+			$subscription_row_count = mysqli_num_rows($sql_query1);
+
+
+			if ($subscription_row_count === 0) {
+			?>
+				<div class="row">
+					<div class="block-free-trial">
+						<p>Grab Your 30 Day Free Trial Right Now!</p>
+						<button class="startTrialBtn">START YOUR FREE TRIAL</button>
+					</div>
+				</div>
+
+			<?php } ?>
+		</section>
+		
+		<section>
+			<div class="row">
+				<?php if ($wo['pro_packages']['hot']['status'] == 1) { ?>
+				<div class="col-xs-12 col-sm-6 col-md-3">
+					<ul class="pricing p-yel">
+						<li class="plan-name"><big><?php echo $wo['lang']['hot'];?></big></li>
+						<li class="price-table-head">
+							<?php if (!empty($wo['pro_packages']['hot']['image'])) { ?>
+								<!-- <div>
+									<img src="<?php echo($wo['pro_packages']['hot']['image']) ?>" class="pro_packages_icon">
+								</div> -->
+								<div class="clearfix"></div>
+							<?php }else{ ?>
+								<!-- <big><i class="fa fa-fire"></i></big> -->
+							<?php } ?>
+							<h3 style="margin-top: 0px;"><?php echo Wo_GetCurrency($wo['config']['currency']);?><?php echo $wo['pro_packages']['hot']['price'];?></h3>
+							<span><?php 
+							if ($wo['pro_packages']['hot']['time'] == 7) {
+								echo $wo['lang']['per_week'];
+							}
+							elseif ($wo['pro_packages']['hot']['time'] == 30) {
+								echo $wo['lang']['per_month'];
+							}
+							elseif ($wo['pro_packages']['hot']['time'] == 365) {
+								echo $wo['lang']['per_year'];
+							}
+							elseif ($wo['pro_packages']['hot']['time'] == 0) {
+								echo $wo['lang']['life_time'];
+							}
+							else{
+								echo $wo['pro_packages']['hot']['time'].' '.$wo['lang']['day'];
+							}
+
+							?></span>
+						</li>
+						<li style="margin-bottom: 10px;"> 
+							<a href="<?php echo ('payment/' . $wo['pro_packages']['hot']['type']); ?>" class="btn checkout-btn checkout2"><?php echo $wo['lang']['upgrade_now'];?></a>
+						</li>						
+					</ul>
+				</div>
+				<?php } ?>
+				<?php if ($wo['pro_packages']['ultima']['status'] == 1) { ?>
+				<div class="col-xs-12 col-sm-6 col-md-3 ">
+					<ul class="pricing p-red">
+						<li class="plan-name"><big><?php echo $wo['lang']['ultima'];?></big></li>
+						<li class="price-table-head">
+							<?php if (!empty($wo['pro_packages']['ultima']['image'])) { ?>
+								<!-- <div>
+									<img src="<?php echo($wo['pro_packages']['ultima']['image']) ?>" class="pro_packages_icon">
+								</div> -->
+								<div class="clearfix"></div>
+							<?php }else{ ?>
+								<!-- <big><i class="fa fa-bolt"></i></big> -->
+							<?php } ?>
+							<h3 style="margin-top: 0px;"><?php echo Wo_GetCurrency($wo['config']['currency']);?><?php echo $wo['pro_packages']['ultima']['price'];?></h3>
+							<span><?php 
+							if ($wo['pro_packages']['ultima']['time'] == 7) {
+								echo $wo['lang']['per_week'];
+							}
+							elseif ($wo['pro_packages']['ultima']['time'] == 30) {
+								echo $wo['lang']['per_month'];
+							}
+							elseif ($wo['pro_packages']['ultima']['time'] == 365) {
+								echo $wo['lang']['per_year'];
+							}
+							elseif ($wo['pro_packages']['ultima']['time'] == 0) {
+								echo $wo['lang']['life_time'];
+							}
+							else{
+								echo $wo['pro_packages']['ultima']['time'].' '.$wo['lang']['day'];
+							}
+							?></span>
+						</li>
+						<li style="margin-bottom: 10px;">
+							<a href="<?php echo ('payment/' . $wo['pro_packages']['ultima']['type']); ?>" class="btn checkout-btn checkout3"><?php echo $wo['lang']['upgrade_now'];?></a>
+						</li>
+					</ul>
+				</div>
+				<?php } ?>				
+			</div><!-- /row -->
+		</section>
+	</div>
+
 	<div class="list-group text-center wo_pro_features why-choose-pro-main">
 		<div class="why-choose-outer">
 			<div class="why-choose-pro">
 				<h2><?php echo $wo['lang']['why_choose_pro'];?></h2>
 				<div>
-					<p>A PRO account gives you access to the Autoconsultation Tool, which allows you to create a library of presets, organised into folders, that can be quickly applied by clicking or by using a short code</p>
+					<p>A PRO account gives you access to the Pronto Tool, which allows you to create a library of presets, organised into folders, that can be quickly applied by clicking or by using a short code</p>
 				</div>
 			</div>
 		</div>
@@ -83,7 +192,7 @@
 
 		<div class="why-choose-outer">
 			<div class="why-choose-pro">
-				<h2>Why choose GP Frontier for your presets?</h2>
+				<h2>Why choose Pronto for your presets?</h2>
 				<div>
 					<ul>
 						<li>Not restricted to a certain software</li>
@@ -91,21 +200,14 @@
 						<li>Not restricted by Organisation permissions</li>
 						<li>Easy to organise and retrieve your presets due to a comprehensive library of folders and sub-folders</li>
 						<li>Ability to edit your presets in a way that suits you</li>
+						<li>Templates for over 120 common conditions for you to apply, edit or use for inspiration</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="pricing_table">
-		<!-- <li>
-		<?php //if (!empty($wo['pro_packages']['star']['discount']) && is_numeric($wo['pro_packages']['star']['discount']) && $wo['pro_packages']['star']['discount'] > 0) { ?>
-				<?php //echo $wo['pro_packages']['star']['discount']."% ".$wo['lang']['discount']; ?>
-			<?php //}else{ ?>
-				<i class="fa fa-times red"></i> <?php //echo $wo['lang']['discount'];?>
-			<?php //} ?>
-		</li> -->
-		
+	<div class="pricing_table">		
 		<!-- free trial button -->
 		<section>
 			<?php global $sqlConnect;
@@ -124,7 +226,7 @@
 				<div class="row">
 					<div class="block-free-trial">
 						<p>Grab Your 30 Day Free Trial Right Now!</p>
-						<button id="startTrialBtn">START YOUR FREE TRIAL</button>
+						<button class="startTrialBtn">START YOUR FREE TRIAL</button>
 					</div>
 				</div>
 
@@ -133,111 +235,6 @@
 		
 		<section>
 			<div class="row">
-				<?php if ($wo['pro_packages']['star']['status'] == 1) { ?>
-				<!-- <div class="col-xs-12 col-sm-6 col-md-3">
-					<ul class="pricing p-green">
-						<li class="price-table-head">
-							<?php if (!empty($wo['pro_packages']['star']['image'])) { ?>
-								<div>
-									<img src="<?php echo($wo['pro_packages']['star']['image']) ?>" class="pro_packages_icon">
-								</div>
-								<div class="clearfix"></div>
-							<?php }else{ ?>
-								<big><i class="fa fa-star"></i></big>
-							<?php } ?>
-							<h3><?php echo Wo_GetCurrency($wo['config']['currency']);?><?php echo $wo['pro_packages']['star']['price'];?></h3>
-							<span><?php 
-							if ($wo['pro_packages']['star']['time'] == 7) {
-								echo $wo['lang']['per_week'];
-							}
-							elseif ($wo['pro_packages']['star']['time'] == 30) {
-								echo $wo['lang']['per_month'];
-							}
-							elseif ($wo['pro_packages']['star']['time'] == 365) {
-								echo $wo['lang']['per_year'];
-							}
-							elseif ($wo['pro_packages']['star']['time'] == 0) {
-								echo $wo['lang']['life_time'];
-							}
-							else{
-								echo $wo['pro_packages']['star']['time'].' '.$wo['lang']['day'];
-							}
-							?></span>
-						</li>
-						<li class="plan-name"><big><?php echo $wo['lang']['star'];?></big></li>
-						<li>
-							<?php if ($wo['pro_packages']['star']['featured_member']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							 <?php echo $wo['lang']['featured_member'];?>
-						</li>
-						<li>
-							<?php if ($wo['pro_packages']['star']['profile_visitors']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							<?php echo $wo['lang']['see_profile_visitors'];?>
-						</li>
-						<li>
-							<?php if ($wo['pro_packages']['star']['last_seen']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?> 
-							<?php echo $wo['lang']['show_hide_lastseen'];?>
-						</li>
-						<li>
-							<?php if ($wo['pro_packages']['star']['verified_badge']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							<?php echo $wo['lang']['verified_badge'];?>
-						</li>
-						<li>
-							<?php if (!empty($wo['pro_packages']['star']['posts_promotion']) && is_numeric($wo['pro_packages']['star']['posts_promotion']) && $wo['pro_packages']['star']['posts_promotion'] > 0) { ?>
-								<i class="fa fa-check green"></i>
-								<?php 
-								$post_promotion_star = str_replace('{monthly_boosts}', $wo['pro_packages']['star']['posts_promotion'], $wo['lang']['post_promotion_hot']);
-								echo $post_promotion_star;
-								?>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i><?php echo $wo['lang']['post_promotion_star'];?>
-							<?php } ?>
-						</li>
-						<?php
-						if ($wo['config']['pages'] == 1) {
-						?>
-							<li>
-								<?php if (!empty($wo['pro_packages']['star']['pages_promotion']) && is_numeric($wo['pro_packages']['star']['pages_promotion']) && $wo['pro_packages']['star']['pages_promotion'] > 0) { ?>
-									<i class="fa fa-check green"></i>
-									<?php 
-									$page_promotion_star = str_replace('{monthly_boosts}', $wo['pro_packages']['star']['pages_promotion'], $wo['lang']['page_promotion_hot']);
-									echo $page_promotion_star;
-									?>
-								<?php }else{ ?>
-									<i class="fa fa-times red"></i><?php echo $wo['lang']['page_promotion_star'];?>
-								<?php } ?>
-							</li>
-						<?php } ?>
-						<li>
-							<?php if ($wo['pro_packages']['star']['autoconsult'] == 1) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							Auto Consult
-						</li>
-						
-						<li>
-							<a href="<?php echo ('payment/' . $wo['pro_packages']['star']['type']); ?>" class="btn checkout-btn checkout1"><?php echo $wo['lang']['upgrade_now'];?></a>
-						</li>
-					</ul>
-				</div> -->
-				<?php } ?>
 				<?php if ($wo['pro_packages']['hot']['status'] == 1) { ?>
 				<div class="col-xs-12 col-sm-6 col-md-3">
 					<ul class="pricing p-yel">
@@ -338,7 +335,7 @@
 							<?php }else{ ?>
 								<i class="fa fa-times red"></i>
 							<?php } ?>
-							Auto Consult
+							Pronto
 						</li> -->
 						
 					</ul>
@@ -443,117 +440,12 @@
 							<?php }else{ ?>
 								<i class="fa fa-times red"></i>
 							<?php } ?>
-							Auto Consult
+							Pronto
 						</li> -->
 						
 					</ul>
 				</div>
-				<?php } ?>
-				<?php if ($wo['pro_packages']['vip']['status'] == 1) { ?>
-				<!-- <div class="col-xs-12 col-sm-6 col-md-3">
-					<ul class="pricing p-blue">
-						<li class="price-table-head">
-							<?php if (!empty($wo['pro_packages']['vip']['image'])) { ?>
-								<div>
-									<img src="<?php echo($wo['pro_packages']['vip']['image']) ?>" class="pro_packages_icon">
-								</div>
-								<div class="clearfix"></div>
-							<?php }else{ ?>
-								<big><i class="fa fa-rocket"></i></big>
-							<?php } ?>
-							<h3><?php echo Wo_GetCurrency($wo['config']['currency']);?><?php echo $wo['pro_packages']['vip']['price'];?></h3>
-							<span><?php 
-							if ($wo['pro_packages']['vip']['time'] == 7) {
-								echo $wo['lang']['per_week'];
-							}
-							elseif ($wo['pro_packages']['vip']['time'] == 30) {
-								echo $wo['lang']['per_month'];
-							}
-							elseif ($wo['pro_packages']['vip']['time'] == 365) {
-								echo $wo['lang']['per_year'];
-							} 
-							elseif ($wo['pro_packages']['vip']['time'] == 0) {
-								echo $wo['lang']['life_time'];
-							}
-							else{
-								echo $wo['pro_packages']['vip']['time'].' '.$wo['lang']['day'];
-							}
-							?></span>
-						</li>
-						<li class="plan-name"><big><?php echo $wo['lang']['vip'];?></big></li>
-						<li>
-							<?php if ($wo['pro_packages']['vip']['featured_member']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							<?php echo $wo['lang']['featured_member'];?>
-						</li>
-						<li>
-							<?php if ($wo['pro_packages']['vip']['profile_visitors']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							<?php echo $wo['lang']['see_profile_visitors'];?>
-						</li>
-						<li>
-							<?php if ($wo['pro_packages']['vip']['last_seen']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?> 
-							<?php echo $wo['lang']['show_hide_lastseen'];?>
-						</li>
-						<li>
-							<?php if ($wo['pro_packages']['vip']['verified_badge']) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							<?php echo $wo['lang']['verified_badge'];?>
-						</li>
-						<li>
-							<?php if (!empty($wo['pro_packages']['vip']['posts_promotion']) && is_numeric($wo['pro_packages']['vip']['posts_promotion']) && $wo['pro_packages']['vip']['posts_promotion'] > 0) { ?>
-								<i class="fa fa-check green"></i>
-								<?php 
-								$post_promotion_vip = str_replace('{lifetime_boosts}', $wo['pro_packages']['vip']['posts_promotion'], $wo['lang']['post_promotion_vip']);
-								echo $post_promotion_vip;
-								?>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i><?php echo $wo['lang']['post_promotion_star'];?>
-							<?php } ?>
-						</li>
-						<?php
-						if ($wo['config']['pages'] == 1) {
-						?>
-							<li>
-
-								<?php if (!empty($wo['pro_packages']['vip']['pages_promotion']) && is_numeric($wo['pro_packages']['vip']['pages_promotion']) && $wo['pro_packages']['vip']['pages_promotion'] > 0) { ?>
-									<i class="fa fa-check green"></i>
-									<?php 
-									$page_promotion_vip = str_replace('{monthly_boosts}', $wo['pro_packages']['vip']['pages_promotion'], $wo['lang']['page_promotion_hot']);
-									echo $page_promotion_vip;
-									?>
-								<?php }else{ ?>
-									<i class="fa fa-times red"></i><?php echo $wo['lang']['page_promotion_star'];?>
-								<?php } ?>
-							</li>
-						<?php } ?>
-						<li>
-							<?php if ($wo['pro_packages']['vip']['autoconsult'] == 1) { ?>
-								<i class="fa fa-check green"></i>
-							<?php }else{ ?>
-								<i class="fa fa-times red"></i>
-							<?php } ?>
-							Auto Consult
-						</li>
-						<li>
-							<a href="<?php echo ('payment/' . $wo['pro_packages']['vip']['type']); ?>" class="btn checkout-btn checkout4"><?php echo $wo['lang']['upgrade_now'];?></a>
-						</li>
-					</ul>
-				</div> -->
-				<?php } ?>
+				<?php } ?>				
 			</div><!-- /row -->
 		</section>
 	</div>
@@ -669,7 +561,7 @@
 						<?php }else{ ?>
 							<i class="fa fa-times red"></i>
 						<?php } ?>
-						Auto Consult
+						Pronto
 					</li> -->
 					
 				</ul>
@@ -774,7 +666,7 @@
 						<?php }else{ ?>
 							<i class="fa fa-times red"></i>
 						<?php } ?>
-						Auto Consult
+						Pronto
 					</li> -->
 					
 				</ul>
@@ -794,22 +686,8 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 	$(document).ready(function() {
-		$('#startTrialBtn').on('click', function() {
+		$('.startTrialBtn').on('click', function() {
 			$('#FreeTrialModal').modal();
-			/* Swal.fire({
-				title: 'Do you want to start a 30-day free trial?',
-				icon: 'info',
-				showCancelButton: true,
-				confirmButtonText: 'Yes',
-				cancelButtonText: 'No',
-				customClass: {
-					popup: 'custom-swal',
-				},
-			}).then((result) => {
-				if (result.isConfirmed) {
-					startTrial();
-				}
-			}); */
 		});
 
 		

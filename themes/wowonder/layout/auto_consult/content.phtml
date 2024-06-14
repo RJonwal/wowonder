@@ -1,4 +1,10 @@
 <div class="page-margin">
+	<div class="alert alert-info alert-dismissible show disclamer-main hidden"  role="alert">
+		<div><span>Disclaimer: </span><p>Under no circumstances should any of the templates be considered as clinical advice</p>
+		<button type="button" class="close disclaimer-close-btn" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button></div>
+	</div>
 	<div class="row wo_find_friends">
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
 		<div class="col-md-7 singlecol">
@@ -414,7 +420,7 @@
 					</div>
 				</div>
 				<div class="containers" style="padding-top: 20px;">
-					<div class="row">
+					<div class="row sortable-containment">
 						<div class="col-md-7" id="sortable">
 							<?php
 							$getcategory = getallrow_fn("select * from category_details where parent_id='0' and cby='" . $userid . "'  ORDER BY dorder ASC");
@@ -452,7 +458,7 @@
 													<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i>
 												</div>
 											<?php } ?>
-											<ul class='nested'>
+											<ul class='nested nested_main_category'>
 												<?php
 												$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 												
@@ -465,7 +471,7 @@
 														$psc = $row_getpreset['short_code'];
 														$mrk = $row_getpreset['mark_favourite'];
 												?>
-														<li id="<?php echo $pid; ?>" data-type="preset">
+														<li id="<?php echo $pid; ?>" class="preset-drag-handle" data-type="preset">
 															<span style="color:green" onclick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
 																<div class="tooltip 303"><i class="fa fa-plus-circle line308">&nbsp;&nbsp;</i><span class="tooltiptext"><?php echo $preset; ?></span></div>
 																<span><?php echo limit_text($preset); ?></span>
@@ -492,7 +498,7 @@
 															<span class="box"><?php echo $scat; ?></span>
 															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onclick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
-															echo "<ul class='nested'  id='" . $id . "'>";
+															echo "<ul class='nested nested_sub_category'  id='" . $id . "'>";
 															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 															if (mysqli_num_rows($getpreset)) {
 																while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
@@ -502,7 +508,7 @@
 																	$psc = $row_getpreset['short_code'];
 																	$mrk = $row_getpreset['mark_favourite'];
 															?>
-														<li id="<?php echo $pid; ?>" data-type="preset">
+														<li id="<?php echo $pid; ?>" class="preset-drag-handle" data-type="preset">
 															<span style="color:green" onclick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
 																<div class="tooltip 342"><i class="fa fa-plus-circle line346">&nbsp;&nbsp;</i>
 																	<span class="tooltiptext"><?php echo $preset; ?></span>
@@ -532,7 +538,7 @@
 																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 																	if (mysqli_num_rows($getpreset3)) {
 															?>
-																<ul class='nested' id="<?php echo $id; ?>">
+																<ul class='nested nested_sub_sub_category' id="<?php echo $id; ?>">
 																	<?php
 																		while ($row_getpreset3 = mysqli_fetch_assoc($getpreset3)) {
 																			// print_r($row_getpreset3);
@@ -542,7 +548,7 @@
 																			$psc = $row_getpreset3['short_code'];
 																			$mrk = $row_getpreset3['mark_favourite'];
 																	?>
-																		<li class="4">
+																		<li class="preset-drag-handle">
 																			<span style="color:green" onClick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
 																				<div class="tooltip 377">
 																					<i class="fa fa-plus-circle line382">&nbsp;&nbsp;</i>
@@ -726,7 +732,7 @@
 														<li> <span class="box"><?php echo $scat; ?></span>
 															<div class="pull-right"><i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i></div>
 															<?php
-															echo "<ul class='nested'>";
+															echo "<ul class='nested nested_sub_category'>";
 															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 															if (mysqli_num_rows($getpreset)) {
 																while ($row_getpreset = mysqli_fetch_assoc($getpreset)) {
@@ -757,7 +763,7 @@
 																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 																	if (mysqli_num_rows($getpreset3)) {
 															?>
-																<ul class='nested'>
+																<ul class='nested nested_sub_sub_category'>
 																	<?php
 																		while ($row_getpreset3 = mysqli_fetch_assoc($getpreset3)) {
 																			$pid = $row_getpreset3['id'];
@@ -766,7 +772,7 @@
 																			$psc = $row_getpreset3['short_code'];
 																			$mrk = $row_getpreset3['mark_favourite'];
 																	?>
-																		<li class="4">
+																		<li class="preset-drag-handle">
 																			<span style="color:green" onClick="addtextinbox('<?php echo substr(json_encode($preset), 1, -1); ?>')">
 																				<div class="tooltip 594">
 																					<i class="fa fa-plus-circle line624">&nbsp;&nbsp;</i>
@@ -829,15 +835,27 @@
 				<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 				<script>
 					$(function() {
-						/*
-						$('#12 ul li').each(function(i, li) {
-						var $product = $(li);
-							console.log($product.attr('id'));
+						// Retrieve the value of the key
+						if (localStorage.getItem("disclaimer-close") !== null) {
+							var isKey = localStorage.getItem("disclaimer-close");
+							if(isKey == "true"){
+								$('.disclamer-main').remove();
+							}
+						} else {
+							$('.disclamer-main').removeClass('hidden');
+						}
+
+						$(document).on('click', '.disclaimer-close-btn', function(e){
+							// Add a key to localStorage
+							$('.disclamer-main').remove();
+  							localStorage.setItem("disclaimer-close", "true");
 						});
-						*/
+
 						$("#sortable ul").sortable({
 							connectWith: "#sortable ul",
+							containment: ".sortable-containment",
 							tolerance: 'pointer',
+							// axis: "y",
 							cancel: '.add-preset-li',
 							update: function(event, ui) {
 								var dorder = ui.item.index();
@@ -871,14 +889,12 @@
 								//Reetting all order
 								$('#' + selectid + '>ul>li').each(function(i, li) {
 									var $product = $(li);
-									//console.log($product.attr('id'));
 									var id = $product.attr("id");
 									if (selectid == "sortable") {
 										ul_id = id;
 									}
 									var dorder = $product.index();
 									var data_type = $product.attr("data-type");
-									console.log(dorder, id);
 									$.post("function/function.php", {
 											action: "update_dorder",
 											catid: id,
@@ -887,15 +903,20 @@
 											data_type: data_type
 										},
 										function(data, status) {
-											//console.log(data);
-											//alert("Data: " + data + "\nStatus: " + status);
 										});
 								});
 							},
 							start: function(event, ui) {
+							},
+							receive: function(event, ui) {
+								if(!$(ui.item).hasClass('preset-drag-handle')){
+									if ($(ui.item).parent().hasClass('nested_sub_sub_category')) {
+										$(ui.sender).sortable('cancel');
+									}
+								}
 							}
 						});
-						$("#sortable ul").disableSelection();
+						// $("#sortable ul").disableSelection();
 					});
 				</script>
 				<script>
@@ -1060,8 +1081,6 @@
 						var old_cat_ids = JSON.parse(localStorage.getItem("catids"));
 						for (i = 0; i < old_cat_ids.length; ++i) {
 							if (old_cat_ids[i] > 0) {
-								//console.log(old_cat_ids[i])
-								//$("#"+old_cat_ids[i]+">span").addClass("check-box");
 								$(".cat" + old_cat_ids[i] + ">span").addClass("check-box");
 							}
 						}
@@ -1077,11 +1096,7 @@
 					function check_ids() {
 						var catids = [];
 						$('.check-box').each(function() {
-							//console.log("Checked");
 							var cat_id = $(this).closest("li").attr('id');
-							//console.log(cat_id);
-							//console.log(catids.length);
-							//var catids = catids;
 							catids[cat_id] = cat_id;
 							localStorage.setItem("catids", JSON.stringify(catids));
 						});

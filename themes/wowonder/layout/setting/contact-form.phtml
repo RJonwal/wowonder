@@ -1,0 +1,85 @@
+<div class="wo_settings_page">
+	<h3>Contact Form</h3>
+
+	<form class="setting-contact-form form-horizontal" method="post">
+		<div class="setting-contact-alert setting-update-alert"></div>
+
+		<!-- Text input-->
+		<div class="setting-panel row">
+			<div class="form-group col-lg-6">
+				<label class="col-md-12" for="first_name"><?php echo $wo['lang']['first_name']; ?>*</label>
+				<div class="col-md-12">
+					<input id="first_name" name="first_name" type="text" class="form-control input-md" autocomplete="off" required>
+					<span class="help-block checking"></span> 
+                    <!-- value="<?php //echo $wo['setting']['first_name'];?>"  -->
+				</div>
+			</div>
+            <div class="form-group col-lg-6">
+				<label class="col-md-12" for="last_name"><?php echo $wo['lang']['last_name']; ?>*</label>
+				<div class="col-md-12">
+					<input id="last_name" name="last_name" type="text" class="form-control input-md" autocomplete="off" required>
+					<span class="help-block checking"></span>
+                    <!-- value="<?php //echo $wo['setting']['last_name'];?>"  -->
+				</div>
+			</div>
+			<div class="form-group col-lg-12">
+				<label class="col-md-12" for="email"><?php echo $wo['lang']['email']; ?>* </label>
+				<div class="col-md-12">
+					<input name="email" id="email" type="email" class="form-control input-md" autocomplete="off" required>
+                    <span class="help-block checking"></span>
+                    <!-- value="<?php //echo $wo['setting']['email'];?>"  -->
+				</div>
+			</div>
+            <div class="form-group col-lg-12">
+				<label class="col-md-12" for="message"><?php echo $wo['lang']['message']; ?>* </label>
+				<div class="col-md-12">
+                    <textarea name="message" id="message" rows="4" class="form-control input-md" style="min-height: 250px;" required></textarea>
+                    <span class="help-block checking"></span>
+				</div>
+			</div>
+        </div>
+		<div class="form-group last-sett-btn modal-footer">
+			<div class="ball-pulse">
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+			<button type="submit" class="btn btn-main setting-panel-mdbtn" id="update_user_data">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle">
+					<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+					<polyline points="22 4 12 14.01 9 11.01"></polyline>
+				</svg>
+				<?php echo $wo['lang']['send']; ?>
+			</button>
+		</div>
+        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+	</form>
+</div>
+<script type="text/javascript">
+	$(function() {
+		$('form.setting-contact-form').ajaxForm({
+			url: Wo_Ajax_Requests_File() + '?f=add_contact_form',
+			beforeSend: function() {
+				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+			},
+			success: function(data) {
+				scrollToTop();
+				if (data.status == 200) {
+                    $('.setting-contact-alert').html('<div class="alert alert-success">' + data.message + '</div>');
+                    $('.alert-success').fadeIn('fast', function() {
+                        $(this).delay(2500).slideUp(500, function() {
+                            $(this).remove();
+                            window.location.reload();
+                        });
+                    });
+				} else if (data.errors) {
+					var errors = data.errors.join("<br>");
+					$('.setting-contact-alert').html('<div class="alert alert-danger">' + errors + '</div>');
+					$('.alert-danger').fadeIn(300);
+				}
+				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+			}
+		});
+		
+	});
+</script>
