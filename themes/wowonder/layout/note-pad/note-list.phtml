@@ -1,4 +1,4 @@
-<div class="page_list row boosted_pages note-list-item">
+<div class="page_list row boosted_pages note-list-item note-list-item_<?php echo $wo['notepad']['id']; ?>">
   <div class="col-xs-12 col-md-12">
     <div class="page_info">
       <ul>
@@ -45,11 +45,19 @@
                 beforeSend: function() {
             $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
           },
-                success: function(data) {
+          success: function(data) {
             scrollToTop();
             //console.log(data);
             if (data.status == 200) {
-              window.location.href = data.location;
+
+              $('.note-list-item_'+noteId).remove();
+              
+              $('.app-general-alert').html('<div class="alert alert-success">The Note is deleted successfully!</div>');
+              $('.alert-success').fadeIn(300);
+
+              setTimeout(() => {
+                $('.alert-success').fadeOut(300);
+              }, 3000);
             } else {
               //var errors = data.errors.join("<br>");
               var errors = data.message;

@@ -29,6 +29,13 @@ body:before{content:none;}
 	margin:0 0 15px 0;
 }
 .left_text ul li img{margin:0 10px 0 0;}
+
+.feature-list {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 10px;
+}
 </style>
 <div class="wrapper">
 <div class="typing-element"></div>
@@ -36,12 +43,28 @@ body:before{content:none;}
       <div class="col-md-6">
       <div class="left_text">
       <img src="<?php echo $wo['config']['theme_url'];?>/img/logo.png">
-      <ul>
-<li><img src="<?php echo $wo['config']['theme_url'];?>/img/group.png"> Connect with your colleagues</li>
-      <li><img src="<?php echo $wo['config']['theme_url'];?>/img/search.png"> Discover and store new resources</li>
-      <li><img src="<?php echo $wo['config']['theme_url'];?>/img/thoughts.png"> Share your ideas, thoughts and queries</li>
-      <li><img src="<?php echo $wo['config']['theme_url'];?>/img/check.png"> Stay updated on the latest changes</li>
-</ul>
+      	<ul>
+			<li class="feature-list">
+				<div><img src="<?php echo $wo['config']['theme_url']; ?>/img/group.png"></div>
+				<div>Connect with your colleagues</div>
+			</li>
+			<li class="feature-list">
+				<div><img src="<?php echo $wo['config']['theme_url']; ?>/img/search.png"></div>
+				<div>Discover and store new resources</div>
+			</li>
+			<li class="feature-list">
+				<div><img src="<?php echo $wo['config']['theme_url']; ?>/img/thoughts.png"></div>
+				<div>Share your ideas, thoughts and queries</div>
+			</li>
+			<li class="feature-list">
+				<div><img src="<?php echo $wo['config']['theme_url']; ?>/img/check.png"></div>
+				<div>Stay updated on the latest changes</div>
+			</li>
+			<li class="feature-list">
+				<div><img src="<?php echo $wo['config']['theme_url']; ?>/img/edit-icon.png" style="width:32px;"></div>
+				<div>Document faster with Pronto</div>
+			</li>
+		</ul>
       </div>
       </div>
       <div class="col-md-5">

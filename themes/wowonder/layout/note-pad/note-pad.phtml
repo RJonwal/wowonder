@@ -20,6 +20,7 @@
 				<div class="clear"></div>
 			</h3>
 			<div class="wo_settings_page">
+				<div class="app-general-alert setting-update-alert" style="display: inline;"></div>
 				<form class="node-pad-form form-horizontal" method="post">
 					<div class="setting-panel row">
 						<!-- Text input-->
@@ -37,7 +38,6 @@
 							</div>
 						</div>
 					</div>
-					<div class="app-general-alert setting-update-alert"></div>
 					<div class="form-group last-sett-btn modal-footer">
 						<div class="ball-pulse">
 							<div></div>
@@ -76,7 +76,15 @@
 				scrollToTop();
 				//console.log(data);
 				if (data.status == 200) {
-					window.location.href = data.location;
+					$('.app-general-alert').html('<div class="alert alert-success">The Note is added successfully!</div>');
+					$('.alert-success').fadeIn(300);
+
+					setTimeout(() => {
+						$('.alert-success').fadeOut(300);
+					}, 3000);
+
+					// window.location.href = data.location;
+					$('form.node-pad-form')[0].reset();
 				} else {
 					//var errors = data.errors.join("<br>");
 					var errors = data.message;
