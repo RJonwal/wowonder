@@ -24,7 +24,9 @@ if ($f == 'register') {
         setcookie('user_id', null, -1, '/');
     }
     $fields = Wo_GetWelcomeFileds();
-    if (empty($post_email) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['custom_utype'])) {
+    if(!isset($_POST['accept_terms'])){
+        $errors = $error_icon . "Ensure all boxes filled and the check box ticked";
+    } else if (empty($post_email) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['custom_utype'])) {
         $errors = $error_icon . $wo['lang']['please_check_details'];
     } else {
         $is_exist = Wo_IsNameExist($_POST['username'], 0);

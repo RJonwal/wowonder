@@ -52,12 +52,9 @@
 
               $('.note-list-item_'+noteId).remove();
               
-              $('.app-general-alert').html('<div class="alert alert-success">The Note is deleted successfully!</div>');
-              $('.alert-success').fadeIn(300);
-
-              setTimeout(() => {
-                $('.alert-success').fadeOut(300);
-              }, 3000);
+              $('.app-general-alert').html('<div class="alert alert-success">The note is deleted successfully!</div>');
+              
+              window.location.reload();
             } else {
               //var errors = data.errors.join("<br>");
               var errors = data.message;

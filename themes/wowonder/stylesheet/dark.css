@@ -711,3 +711,9 @@ a.main {
 .setting-privacy-form label {
     text-transform: uppercase;
 }
+
+
+a.btn-notpad-title {
+    color: #fff !important;
+    text-decoration: none;
+}

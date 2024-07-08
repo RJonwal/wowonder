@@ -10,13 +10,6 @@ if ($f == "edit_note_pad") {
         $errors[] = $error_icon . $wo['lang']['please_check_details'];
     }
 
-    // echo "<pre>";
-    // print_r($_POST);
-    // echo "</pre>";
-
-    // echo "<pre>";
-    // print_r($errors);
-    // echo "</pre>";
     if (empty($errors)) {
         $query = mysqli_query($sqlConnect, "SELECT * FROM wo_note_pad WHERE `id` = '{$_POST['noteId']}'");
         $fetched_data = mysqli_fetch_assoc($query);
@@ -45,7 +38,7 @@ if ($f == "edit_note_pad") {
                     $data = array(
                         'message' => $success_icon . 'note updated.',
                         'status' => 200,
-                        'location' => Wo_SeoLink('index.php?link1=notepad')
+                        'location' => Wo_SeoLink('index.php?link1=edit-note-pad&npid=' . $fetched_data['id'])
                     );
                 } else {
                     $data = array(

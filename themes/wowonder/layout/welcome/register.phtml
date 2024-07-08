@@ -28,13 +28,13 @@ body:before{content:none;}
 	color:#fff;
 	margin:0 0 15px 0;
 }
-.left_text ul li img{margin:0 10px 0 0;}
+.left_text ul li img, .left_text ul li i{margin:0 10px 0 0;}
 
 .feature-list {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
-	gap: 10px;
+	gap: 5px;
 }
 </style>
 <div class="wrapper">
@@ -61,7 +61,7 @@ body:before{content:none;}
 				<div>Stay updated on the latest changes</div>
 			</li>
 			<li class="feature-list">
-				<div><img src="<?php echo $wo['config']['theme_url']; ?>/img/edit-icon.png" style="width:32px;"></div>
+				<div><i class="fa fa-pencil" style="width: 32px;text-align: center;"></i></div>
 				<div>Document faster with Pronto</div>
 			</li>
 		</ul>
@@ -85,7 +85,7 @@ body:before{content:none;}
 				<!--<input name="confirm_password" type="password" placeholder="<?php echo $wo['lang']['confirm_password'];?>" />-->
                 
                 <select name="custom_utype" id="custom_utype" required>
-                <option value="0">Choose Role</option>
+                <option value="0">Please add Paramedic</option>
 					<?php
 						foreach(WoUserTYpe() as $key => $value){
 					?>
@@ -124,8 +124,8 @@ body:before{content:none;}
 				<div class="terms">
 					<input type="checkbox" name="accept_terms" id="accept_terms" onchange="activateButton(this)">
 					<label for="accept_terms"> 
-						<!-- <?php echo $wo['lang']['terms_agreement'] ?> <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=terms');?>"><?php echo $wo['lang']['terms_of_use'] ?></a> & <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=privacy-policy');?>"><?php echo $wo['lang']['privacy_policy'] ?></a> -->
-						<span style="color:red;">Ensure all boxes filled and the check box ticked</span>
+						<?php echo $wo['lang']['terms_agreement'] ?> <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=terms');?>"><?php echo $wo['lang']['terms_of_use'] ?></a> & <a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=privacy-policy');?>"><?php echo $wo['lang']['privacy_policy'] ?></a>
+						<!-- <span style="color:red;">Ensure all boxes filled and the check box ticked</span> -->
 					</label>
 					<div class="clear"></div>
 				</div>

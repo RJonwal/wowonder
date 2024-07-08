@@ -20810,12 +20810,13 @@ a.r-pay-btn {
     transform: rotate(45deg);
 }
 .alert-dismissible{
-    background-color: #f8c81c;
+    background-color: #061f6f;
     border-left: none;
-    color: #000;
+    color: #fff !important;
     padding: 20px 50px;
     padding-right: 70px;
     position: relative;
+    border-radius: 9111px;
 }
 .alert-dismissible>div{
     display: flex;
@@ -20824,14 +20825,14 @@ a.r-pay-btn {
 .alert-dismissible>div>span{
     font-size: 18px;
     text-transform: uppercase;
-    padding-right: 10px;
+    padding-right: 13px;
 }
 .alert-dismissible>div>p{
     margin: 0;
 }
 .alert-dismissible>div>.close{
     font-size: 30px;
-    color: #363636;
+    color: #fff !important;
     opacity: 1;
     text-shadow: none;
     position: absolute;
@@ -20892,4 +20893,23 @@ a.r-pay-btn {
 a.btn-notpad-title {
     color: #061f6f;
     text-decoration: none;
+}
+
+.d-flex {
+    display: flex !important;
+} 
+
+ul#filterby-post {
+    display: flex;
+    justify-content: space-between;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.my_pages_header ul li.active a{
+
+    color: #061f6f;
+
+    border-color: #061f6f;
+
 }

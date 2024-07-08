@@ -1,10 +1,15 @@
 <div class="page-margin">
-	<div class="alert alert-info alert-dismissible show disclamer-main hidden"  role="alert">
-		<div><span>Disclaimer: </span><p>Under no circumstances should any of the templates be considered as clinical advice.</p>
-		<button type="button" class="close disclaimer-close-btn" data-dismiss="alert" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button></div>
-	</div>
+	<?php 
+	$userid = $wo['user']['user_id'];
+    $cookie_name = "hide-disclaimer-$userid";
+	if(!isset($_COOKIE[$cookie_name])) { ?>
+		<div class="alert alert-info alert-dismissible show disclamer-main"  role="alert">
+			<div><span>Disclaimer: </span><p>Templates provided below are not Clinical Advice and under no circumstances do they override the Clinician’s responsibility for their documentation.</p>
+			<button type="button" class="close disclaimer-close-btn" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button></div>
+		</div>
+	<?php } ?>
 	<div class="row wo_find_friends">
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
 		<div class="col-md-7 singlecol">
@@ -835,20 +840,21 @@
 				<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 				<script>
 					$(function() {
-						// Retrieve the value of the key
-						if (localStorage.getItem("disclaimer-close") !== null) {
-							var isKey = localStorage.getItem("disclaimer-close");
-							if(isKey == "true"){
-								$('.disclamer-main').remove();
-							}
-						} else {
-							$('.disclamer-main').removeClass('hidden');
-						}
-
 						$(document).on('click', '.disclaimer-close-btn', function(e){
-							// Add a key to localStorage
 							$('.disclamer-main').remove();
-  							localStorage.setItem("disclaimer-close", "true");
+							$.ajax({
+								url: Wo_Ajax_Requests_File(),
+								method: 'GET',
+								data: {
+									f: "hide-disclaimer"
+								},
+								dataType: 'json',
+								success: function(response) {
+									if (response.status) {
+										$('.disclamer-main').remove();
+									}
+								}
+							});
 						});
 
 						$("#sortable ul").sortable({

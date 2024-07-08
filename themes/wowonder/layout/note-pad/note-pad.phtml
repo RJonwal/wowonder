@@ -76,15 +76,9 @@
 				scrollToTop();
 				//console.log(data);
 				if (data.status == 200) {
-					$('.app-general-alert').html('<div class="alert alert-success">The Note is added successfully!</div>');
-					$('.alert-success').fadeIn(300);
-
-					setTimeout(() => {
-						$('.alert-success').fadeOut(300);
-					}, 3000);
-
-					// window.location.href = data.location;
-					$('form.node-pad-form')[0].reset();
+					$('.app-general-alert').html('<div class="alert alert-success">The note is added successfully!</div>');
+					
+					window.location.href = data.location;
 				} else {
 					//var errors = data.errors.join("<br>");
 					var errors = data.message;

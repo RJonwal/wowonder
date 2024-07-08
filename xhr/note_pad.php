@@ -26,7 +26,7 @@ if ($f == "note_pad") {
         );
 
         if (Wo_saveMyNote($nodePadData)) {
-            // $lastId = mysqli_insert_id($sqlConnect);
+            $lastId = mysqli_insert_id($sqlConnect);
             if (!empty($_POST['autosave'])) {
                 $data = array(
                     'message' => $success_icon . 'note added.',
@@ -37,8 +37,8 @@ if ($f == "note_pad") {
                 'message' => $success_icon . 'note added.',
                 'status' => 200,
                 // 'location' => Wo_SeoLink('index.php?link1=notepad')
-                // 'location' => Wo_SeoLink('index.php?link1=edit-note-pad&npid=' . $lastId)
-                'location' => Wo_SeoLink('index.php?link1=note-pad')
+                'location' => Wo_SeoLink('index.php?link1=edit-note-pad&npid=' . $lastId)
+                // 'location' => Wo_SeoLink('index.php?link1=note-pad')
             );
         }
     } else {
