@@ -813,13 +813,13 @@ if ($wo['loggedin'] && $IsOwnerUser) {
             <li class="list-group-item text-muted hidden" contenteditable="false"><?php echo $wo['lang']['details']; ?></li>
 
             <?php if ($wo['config']['user_lastseen'] == 1 && $wo['user_profile']['showlastseen'] != 0 && $wo['loggedin'] == true) {  ?>
-                <li class="list-group-item">
+                <!-- <li class="list-group-item">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                     <?php echo Wo_UserStatus($wo['user_profile']['user_id'], $wo['user_profile']['lastseen'], 'profile') ?>
-                </li>
+                </li> -->
             <?php } ?>
             <li class="list-group-item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3">
@@ -1187,9 +1187,9 @@ if ($wo['loggedin'] && $IsOwnerUser) {
                     <div class="col-md-9">
                         <h4 class="family_mbr_name"><?php echo $wo['user_profile']['name']; ?></h4>
                         <?php if ($wo['config']['user_lastseen'] == 1 && $wo['user_profile']['showlastseen'] != 0) : ?>
-                            <div class="user-lastseen">
+                            <!-- <div class="user-lastseen">
                                 <?php echo Wo_UserStatus($wo['user_profile']['user_id'], $wo['user_profile']['lastseen']); ?>
-                            </div>
+                            </div> -->
                         <?php endif; ?>
                         <div class="add_as_cont">
                             <div class="col-md">
