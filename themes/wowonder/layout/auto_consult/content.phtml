@@ -360,6 +360,7 @@
 								$data['cby'] = $userid;
 								$data['cip'] = ipAddress();
 								$data['cdate'] = date("Y-m-d H:i:s");
+								$data['short_code'] = empty($shortcode) ? null : $shortcode;
 								$data['dorder'] = $order;
 								$insert_value = dbRowInsert("preset_details", test_input($data));
 								if (!empty($insert_value)) {

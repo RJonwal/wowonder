@@ -9,7 +9,7 @@
   
   
   <?php if($wo['config']['user_lastseen'] == 1 && $wo['UsersList']['user_data']['showlastseen'] != 0): ?>
-  <div class="user-lastseen">
+  <!-- <div class="user-lastseen">
     <?php
       if ($wo['UsersList']['user_data']['age'] && $wo['UsersList']['user_data']['birth_privacy'] == 0) {
         echo $wo['UsersList']['user_data']['age'];
@@ -17,7 +17,7 @@
         echo Wo_UserStatus($wo['UsersList']['user_data']['user_id'], $wo['UsersList']['user_data']['lastseen']);
       }
     ?>
-  </div>
+  </div> -->
 
   <?php endif; ?>
   

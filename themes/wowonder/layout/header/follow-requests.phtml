@@ -8,9 +8,9 @@
 				<?php echo $wo['request']['name']; ?>
 			</a>
 			<?php if($wo['config']['user_lastseen'] == 1 && $wo['request']['showlastseen'] != 0) { ?>
-			<div class="user-lastseen" data-toggle="tooltip" title="<?php echo $wo['lang']['last_seen']; ?>">
+			<!-- <div class="user-lastseen" data-toggle="tooltip" title="<?php echo $wo['lang']['last_seen']; ?>">
 				<?php echo Wo_UserStatus($wo['request']['user_id'],$wo['request']['lastseen']); ?>
-			</div>
+			</div> -->
 			<?php } ?>
 		</div>
 		<div class="accept-btns user-follow-button">

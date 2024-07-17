@@ -11,9 +11,9 @@
    </a>
    </span>
    <?php if($wo['config']['user_lastseen'] == 1 && $wo['UsersList']['showlastseen'] != 0): ?>
-   <div class="user-lastseen">
+   <!-- <div class="user-lastseen">
       <?php echo Wo_UserStatus($wo['UsersList']['user_id'],$wo['UsersList']['lastseen']); ?>
-   </div>
+   </div> -->
    <?php endif; ?>
    <div class="user-follow-button">
       <button type="button" onclick="Wo_RegisterAddGroup(<?php echo $wo['UsersList']['user_id'];?>, <?php echo $wo['group_profile']['id'];?>)" class="btn btn-default btn-sm">

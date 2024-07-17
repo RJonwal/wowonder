@@ -18,9 +18,9 @@
    </span>
    </span>
    <?php if($wo['config']['user_lastseen'] == 1 && $wo['review']['user_data']['showlastseen'] != 0): ?>
-   <div class="user-lastseen">
+   <!-- <div class="user-lastseen">
       <?php echo Wo_UserStatus($wo['review']['user_data']['user_id'],$wo['review']['user_data']['lastseen']); ?>
-   </div>
+   </div> -->
    <article class="pointer" style="height: 40px; overflow: hidden;">
    	    <?php if (strlen($wo['review']['review']) > 150):?>
             <?php echo mb_substr($wo['review']['review'],0,150,"UTF-8") . ".."; ?>

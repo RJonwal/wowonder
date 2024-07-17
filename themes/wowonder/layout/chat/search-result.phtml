@@ -15,9 +15,9 @@ $message_count = Wo_CountMessages(array('new' => true,'user_id' => $wo['chatList
          <?php echo $wo['chatList']['name']; ?>
       </span>
       <?php if($wo['config']['user_lastseen'] == 1 && $wo['chatList']['showlastseen'] != 0) { ?>
-      <div class="user-lastseen" >
+      <!-- <div class="user-lastseen" >
          <?php echo Wo_UserStatus($wo['chatList']['user_id'],$wo['chatList']['lastseen']); ?>
-      </div>
+      </div> -->
       <?php } ?>
    </div>
 </div>
