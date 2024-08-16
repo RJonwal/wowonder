@@ -254,7 +254,7 @@
 						getaxecuteQuery_fn("delete from " . $tbl . " where id='$id'");
 					$msg = 'Record Removed.';
 					//giveAlert('Record Removed.');
-					reDirect(getHomeUrl() . "auto_consult");
+					reDirect(getHomeUrl() . "pronto");
 				}
 				if (isset($_REQUEST['baddsubcat'])) {
 					$data['category_name'] = $_POST['subcategory'];
@@ -300,7 +300,7 @@
 							$msg = "Category name is already exist";
 					}
 					//giveAlert($msg);
-					// reDirect(getHomeUrl() . "auto_consult");
+					// reDirect(getHomeUrl() . "pronto");
 				}
 				if (isset($_REQUEST['baddpreset'])) {
 					// echo "<pre>";print_r($_POST);die;
@@ -375,7 +375,7 @@
 							$msg = "Preset is already exist";
 					}
 					//giveAlert($msg);
-					// reDirect(getHomeUrl() . "auto_consult");
+					// reDirect(getHomeUrl() . "pronto");
 				}
 				if (isset($_GET['fav'])) {
 					$id = $_GET['fav'];
@@ -393,7 +393,7 @@
 						$msg = "Some Error Occured,please try again...";
 					}
 					//giveAlert($msg);
-					reDirect(getHomeUrl() . "auto_consult");
+					reDirect(getHomeUrl() . "pronto");
 				}
 				if (isset($_GET['pfav'])) {
 					$id = $_GET['pfav'];
@@ -411,7 +411,7 @@
 						$msg = "Some Error Occured,please try again...";
 					}
 					//giveAlert($msg);
-					reDirect(getHomeUrl() . "auto_consult");
+					reDirect(getHomeUrl() . "pronto");
 				}
 				?>
 				<div class="containers">
@@ -459,7 +459,7 @@
 											<?php if (!empty($id)) { ?>
 												<div class="pull-right">
 													<i class="fa fa-pencil" title="Edit category" onclick="editcategory('<?php echo $id; ?>','<?php echo $cat; ?>')"></i>&nbsp;&nbsp;
-													<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;
+													<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details', '<?php echo $cat ?>')"></i>&nbsp;&nbsp;
 													<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;
 													<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i>
 												</div>
@@ -502,7 +502,7 @@
 												?>
 														<li class="cat<?php echo $id; ?>" id="<?php echo $id; ?>">
 															<span class="box"><?php echo $scat; ?></span>
-															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onclick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i></div>
+															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onclick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details', '<?php echo $scat ?>')"></i>&nbsp;&nbsp;<i style="color:<?php echo $bgcolor; ?>" class="fa fa-square" title="Add Sub category" onclick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onclick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
 															echo "<ul class='nested nested_sub_category'  id='" . $id . "'>";
 															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
@@ -539,7 +539,7 @@
 													?>
 														<li class="cat<?php echo $id; ?>" id="<?php echo $id; ?>">
 															<span class="box"><?php echo $scat; ?></span>
-															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
+															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details', '<?php echo $scat ?>')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
 																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 																	if (mysqli_num_rows($getpreset3)) {
@@ -736,7 +736,7 @@
 														$mrk = $row_getsubcat['mark_favourite'];
 												?>
 														<li> <span class="box"><?php echo $scat; ?></span>
-															<div class="pull-right"><i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i></div>
+															<div class="pull-right"><i class="fa fa-trash" title="Remove category" onclick="deleterecord('<?php echo $id; ?>','category_details', '<?php echo $scat ?>')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onclick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i></div>
 															<?php
 															echo "<ul class='nested nested_sub_category'>";
 															$getpreset = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
@@ -764,7 +764,7 @@
 													?>
 														<li class="3">
 															<span class="box"><?php echo $scat; ?></span>
-															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-square" title="Add Sub category" onClick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
+															<div class="pull-right"><i class="fa fa-pencil" title="Edit Sub category" onClick="editsubcategory('<?php echo $id; ?>','<?php echo $scat; ?>','<?php echo $pid; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-trash" title="Remove category" onClick="deleterecord('<?php echo $id; ?>','category_details', '<?php echo $scat ?>')"></i>&nbsp;&nbsp;<i class="fa fa-star" title="<?php echo $mrk == 1 ? $remove_from_fav : $mark_as_fav; ?>" onClick="location.href='?fav=<?php echo $id; ?>'" style="color:<?php echo $mrk == 1 ? 'orange;' : ''; ?>"></i>&nbsp;&nbsp;<i class="fa fa-square" title="Add Sub category" onClick="addsubcategory('<?php echo $id; ?>')"></i>&nbsp;&nbsp;<i class="fa fa-plus-circle" title="Add Preset" onClick="addpreset('<?php echo $id; ?>')"></i></div>
 															<?php
 																	$getpreset3 = getallrow_fn("select * from preset_details where cat_id='$id' and cby='" . $userid . "'  ORDER BY dorder ASC");
 																	if (mysqli_num_rows($getpreset3)) {
@@ -824,7 +824,7 @@
 						<div class="modal-content">
 							<div class="modal-body">
 								<form action="" method="POST">
-									<p style="text-align: center;">Are you sure,you want to remove this record?</p>
+									<p style="text-align: center;" id="delete-confirm-text">Are you sure,you want to remove this record?</p>
 									<div class="form-group">
 										<input type="hidden" name="tid" id="did">
 										<input type="hidden" name="table" id="tablenm">
@@ -955,8 +955,13 @@
 						$("#add_category").modal()
 					}
 
-					function deleterecord(id, table) {
+					function deleterecord(id, table, cat_name='') {
 						// alert(id);
+						if(cat_name){
+							$('#delete-confirm-text').html('Are you sure,you want to remove this <strong style="margin-right:0px;">'+cat_name+'</strong> category?')
+						} else {
+							$('#delete-confirm-text').text('Are you sure,you want to remove this record?')
+						}
 						$("#did").val(id)
 						$("#tablenm").val(table)
 						$("#delete").modal()
