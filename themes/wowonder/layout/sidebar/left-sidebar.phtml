@@ -4,6 +4,20 @@
 
   <div class="left-sidebar">
     <ul>
+      <?php $access_autoconsult = checkAutoConsultAccess();
+      if(!$access_autoconsult || (Wo_IsAdmin() || Wo_IsModerator())){ ?>
+			  <li> 
+			    <a href="<?php echo Wo_SeoLink('index.php?link1=go-pro'); ?>" data-ajax="?link1=go-pro">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 11.1V14.7C21 19.2 19.2 21 14.7 21H9.3C4.8 21 3 19.2 3 14.7V9.3C3 4.8 4.8 3 9.3 3H12.9" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20.7421 8.4V3L19.1992 4.54286" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20.7432 3L22.286 4.54286" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14.3576 17H9.67859C9.46953 17 9.23558 16.8252 9.16589 16.6134L7.10515 10.481C6.81147 9.60194 7.15493 9.33186 7.86175 9.87202L9.80303 11.3495C10.1266 11.5878 10.4949 11.466 10.6343 11.0794L11.5104 8.59576C11.7891 7.80141 12.252 7.80141 12.5308 8.59576L13.4068 11.0794C13.5462 11.466 13.9145 11.5878 14.2331 11.3495L16.0549 9.96734C16.8314 9.37423 17.2048 9.67608 16.8862 10.6346L14.8752 16.624C14.8006 16.8252 14.5666 17 14.3576 17Z" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <?php echo $wo['lang']['upgrade_to_pro']; ?> 
+          </a> 
+        </li><?php
+    	} ?>
       <li> <a href="<?php echo $wo['user']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username']; ?>">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#047cac;">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -293,21 +307,7 @@
 		</li>-->
 		
 
-      <?php } 
-    	$access_autoconsult = checkAutoConsultAccess();
-        if(!$access_autoconsult || (Wo_IsAdmin() || Wo_IsModerator())){ ?>
-			<li> 
-			    <a href="<?php echo Wo_SeoLink('index.php?link1=go-pro'); ?>" data-ajax="?link1=go-pro">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 11.1V14.7C21 19.2 19.2 21 14.7 21H9.3C4.8 21 3 19.2 3 14.7V9.3C3 4.8 4.8 3 9.3 3H12.9" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20.7421 8.4V3L19.1992 4.54286" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20.7432 3L22.286 4.54286" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14.3576 17H9.67859C9.46953 17 9.23558 16.8252 9.16589 16.6134L7.10515 10.481C6.81147 9.60194 7.15493 9.33186 7.86175 9.87202L9.80303 11.3495C10.1266 11.5878 10.4949 11.466 10.6343 11.0794L11.5104 8.59576C11.7891 7.80141 12.252 7.80141 12.5308 8.59576L13.4068 11.0794C13.5462 11.466 13.9145 11.5878 14.2331 11.3495L16.0549 9.96734C16.8314 9.37423 17.2048 9.67608 16.8862 10.6346L14.8752 16.624C14.8006 16.8252 14.5666 17 14.3576 17Z" stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <?php echo $wo['lang']['upgrade_to_pro']; ?> 
-                </a> 
-            </li><?php
-    	} ?>
+    <?php } ?>
     </ul>
     <div class="sidebar">
       <ul class="list-group trending">
