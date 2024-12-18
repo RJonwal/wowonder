@@ -34,7 +34,7 @@ if ($f == 'contact_us') {
         $email             = Wo_Secure($_POST['email']);
         $message           = Wo_Secure($_POST['message']);
         $name              = $first_name . ' ' . $last_name;
-        $send_message_data = array(
+        /*$send_message_data = array(
             'from_email' => $wo['config']['siteEmail'],
             'from_name' => $name,
             'reply-to' => $email,
@@ -44,8 +44,27 @@ if ($f == 'contact_us') {
             'charSet' => 'utf-8',
             'message_body' => $message,
             'is_html' => false
+        ); */
+
+        $email_template = file_get_contents($wo['config']['site_url'] . '/admin-panel/partials/email-templates/contact_form.php');
+        $email_content = str_replace(
+            [ '[SITE_NAME]', '[NAME]', '[EMAIL]', '[MESSAGE]' ], 
+            [ $wo['config']['siteName'], $name, $email, $message], 
+            $email_template
         );
-        $send              = Wo_SendMessage($send_message_data);
+        
+        $send_message_data = array(
+            'from_email' => $wo['config']['siteEmail'],
+            'from_name' => $name,
+            'reply-to' => $email,
+            'to_email' => CONTACT_EMAIL,
+            'to_name' => $wo['config']['siteName'],
+            'subject' => 'Contact Form new message',
+            'charSet' => 'utf-8',
+            'message_body' => $email_content,
+            'is_html' => true
+        );
+        $send = Wo_SendMessage($send_message_data);
         if ($send) {
             $data = array(
                 'status' => 200,
